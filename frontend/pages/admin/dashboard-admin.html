@@ -1,552 +1,418 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - SpeakLexi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ TAILWIND + CONFIG -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/tailwind-config.js"></script>
+    
+    <!-- ✅ CSS INTERNO -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ APEXCHARTS -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Panel de Administración">
+    <meta name="theme-color" content="#4F46E5">
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Navbar Mejorado -->
-    <nav class="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-8">
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                        SpeakLexi Admin
-                    </h1>
-                    <div class="hidden lg:flex gap-6">
-                        <a href="#" class="text-purple-600 dark:text-purple-400 font-medium border-b-2 border-purple-600 dark:border-purple-400 pb-1">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <i class="fas fa-users mr-2"></i>Usuarios
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <i class="fas fa-book mr-2"></i>Contenido
-                        </a>
-                        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <i class="fas fa-chart-bar mr-2"></i>Analíticas
-                        </a>
-                    </div>
-                </div>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
+    
+    <!-- ✅ CONTENIDO PRINCIPAL -->
+    <main class="min-h-screen pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h2>
+                <p class="text-gray-600 dark:text-gray-300">Gestión completa del sistema SpeakLexi</p>
                 
-                <div class="flex items-center gap-4">
-                    <!-- Toggle Modo Oscuro/Claro -->
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
-                    </button>
-                    
-                    <!-- Notificaciones -->
-                    <div class="relative">
-                        <button class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        </button>
-                    </div>
-                    
-                    <!-- User Menu -->
-                    <div class="relative">
-                        <button class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" class="w-8 h-8 rounded-full" alt="Admin">
-                            <span class="hidden md:block font-medium text-gray-700 dark:text-gray-200">Administrador</span>
-                        </button>
-                    </div>
-                    
-                    <button id="logout-btn" class="px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h2>
-            <p class="text-gray-600 dark:text-gray-300">Gestión completa del sistema SpeakLexi</p>
-            
-            <!-- Breadcrumb -->
-            <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
-                <span>Admin</span>
-                <i class="fas fa-chevron-right text-xs"></i>
-                <span class="text-purple-600 dark:text-purple-400">Dashboard</span>
-            </div>
-        </div>
-
-        <!-- Stats Cards Mejoradas -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Usuarios Totales</p>
-                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">1,247</p>
-                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
-                            <i class="fas fa-arrow-up mr-1"></i>12% este mes
-                        </p>
-                    </div>
-                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
-                    </div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span>Admin</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="text-purple-600 dark:text-purple-400">Dashboard</span>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Activas</p>
-                        <p class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">156</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">+8 esta semana</p>
-                    </div>
-                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-book text-green-600 dark:text-green-400 text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Profesores</p>
-                        <p class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">28</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Activos: 24</p>
-                    </div>
-                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chalkboard-teacher text-purple-600 dark:text-purple-400 text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Actividad Hoy</p>
-                        <p class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">342</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">sesiones activas</p>
-                    </div>
-                    <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chart-line text-orange-600 dark:text-orange-400 text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            <!-- Left Column - 2/3 width -->
-            <div class="xl:col-span-2 space-y-8">
-                <!-- Gráfico de Actividad -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Actividad de Usuarios</h3>
-                        <div class="flex gap-2">
-                            <button class="px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">7 días</button>
-                            <button class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">30 días</button>
+            <!-- Stats Cards Mejoradas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Usuarios Totales</p>
+                            <p class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">1,247</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>12% este mes
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
                         </div>
                     </div>
-                    <div id="activity-chart" class="h-80"></div>
                 </div>
 
-                <!-- Gestión Rápida -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Gestión de Contenido -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Activas</p>
+                            <p class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">156</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">+8 esta semana</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-book text-green-600 dark:text-green-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Profesores</p>
+                            <p class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">28</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Activos: 24</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chalkboard-teacher text-purple-600 dark:text-purple-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Actividad Hoy</p>
+                            <p class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">342</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">sesiones activas</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chart-line text-orange-600 dark:text-orange-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <!-- Left Column - 2/3 width -->
+                <div class="xl:col-span-2 space-y-8">
+                    <!-- Gráfico de Actividad -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Gestión de Contenido</h3>
-                        <div class="space-y-3">
-                            <button class="w-full flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-800 transition-colors group">
-                                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-plus-circle text-purple-600 dark:text-purple-400"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Crear Nueva Lección</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Agregar contenido educativo</p>
-                                </div>
-                            </button>
-                            
-                            <button class="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors group">
-                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-edit text-blue-600 dark:text-blue-400"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Editar Lecciones</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Modificar contenido existente</p>
-                                </div>
-                            </button>
-                            
-                            <button class="w-full flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-xl border border-green-200 dark:border-green-800 transition-colors group">
-                                <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-file-upload text-green-600 dark:text-green-400"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Agregar Multimedia</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Subir recursos educativos</p>
-                                </div>
-                            </button>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Actividad de Usuarios</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">7 días</button>
+                                <button class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">30 días</button>
+                            </div>
+                        </div>
+                        <div id="activity-chart" class="h-80"></div>
+                    </div>
+
+                    <!-- Gestión Rápida -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Gestión de Contenido -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Gestión de Contenido</h3>
+                            <div class="space-y-3">
+                                <button class="w-full flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-plus-circle text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Crear Nueva Lección</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Agregar contenido educativo</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-edit text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Editar Lecciones</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Modificar contenido existente</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-xl border border-green-200 dark:border-green-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-file-upload text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Agregar Multimedia</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Subir recursos educativos</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gestión de Usuarios -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Gestión de Usuarios</h3>
+                            <div class="space-y-3">
+                                <button class="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-user-plus text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Agregar Usuario</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Nuevo estudiante/profesor</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-xl border border-yellow-200 dark:border-yellow-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-list text-yellow-600 dark:text-yellow-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Ver Usuarios</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Lista completa</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-xl border border-orange-200 dark:border-orange-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-user-shield text-orange-600 dark:text-orange-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Gestionar Permisos</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Roles y accesos</p>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Gestión de Usuarios -->
+                    <!-- Tabla de Usuarios Recientes -->
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Gestión de Usuarios</h3>
-                        <div class="space-y-3">
-                            <button class="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors group">
-                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-user-plus text-blue-600 dark:text-blue-400"></i>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Usuarios Recientes</h3>
+                            <button class="text-sm text-purple-600 dark:text-purple-400 hover:underline font-semibold">Ver todos</button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Usuario</th>
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Rol</th>
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Estado</th>
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <td class="py-3">
+                                            <div class="flex items-center gap-3">
+                                                <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=6366f1&color=fff" class="w-8 h-8 rounded-full" alt="">
+                                                <div>
+                                                    <p class="font-medium text-gray-900 dark:text-white">Ana López</p>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">ana@email.com</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
+                                        </td>
+                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Hoy</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <td class="py-3">
+                                            <div class="flex items-center gap-3">
+                                                <img src="https://ui-avatars.com/api/?name=Carlos+Ruiz&background=10b981&color=fff" class="w-8 h-8 rounded-full" alt="">
+                                                <div>
+                                                    <p class="font-medium text-gray-900 dark:text-white">Carlos Ruiz</p>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">carlos@email.com</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">Profesor</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
+                                        </td>
+                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Ayer</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <td class="py-3">
+                                            <div class="flex items-center gap-3">
+                                                <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=f59e0b&color=fff" class="w-8 h-8 rounded-full" alt="">
+                                                <div>
+                                                    <p class="font-medium text-gray-900 dark:text-white">María García</p>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">maria@email.com</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-full">Pendiente</span>
+                                        </td>
+                                        <td class="py-3 text-sm text-gray-600 dark:text-gray-400">15/10/2025</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - 1/3 width -->
+                <div class="space-y-8">
+                    <!-- Métricas del Sistema -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Métricas del Sistema</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600 dark:text-gray-400">Uso de CPU</span>
+                                    <span class="text-gray-900 dark:text-white">42%</span>
                                 </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Agregar Usuario</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Nuevo estudiante/profesor</p>
+                                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-green-500 rounded-full h-2 transition-all duration-1000" style="width: 42%"></div>
                                 </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600 dark:text-gray-400">Memoria</span>
+                                    <span class="text-gray-900 dark:text-white">68%</span>
+                                </div>
+                                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-500 rounded-full h-2 transition-all duration-1000" style="width: 68%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600 dark:text-gray-400">Almacenamiento</span>
+                                    <span class="text-gray-900 dark:text-white">35%</span>
+                                </div>
+                                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 rounded-full h-2 transition-all duration-1000" style="width: 35%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600 dark:text-gray-400">Uptime</span>
+                                    <span class="text-green-600 dark:text-green-400 font-semibold">99.9%</span>
+                                </div>
+                                <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-green-500 rounded-full h-2 transition-all duration-1000" style="width: 99.9%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distribución de Idiomas -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Distribución de Idiomas</h3>
+                        <div id="language-chart" class="h-64"></div>
+                    </div>
+
+                    <!-- Actividad Reciente -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Actividad Reciente</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-user-plus text-blue-600 dark:text-blue-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Nuevo usuario registrado</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Ana López se unió hace 2 horas</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                                <div class="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-book text-green-600 dark:text-green-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Lección completada</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Carlos Ruiz completó "Vocabulario Básico"</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-chart-line text-purple-600 dark:text-purple-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Nivel alcanzado</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">María García alcanzó el nivel B1</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-download text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Reporte</span>
                             </button>
                             
-                            <button class="w-full flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-xl border border-yellow-200 dark:border-yellow-800 transition-colors group">
-                                <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-list text-yellow-600 dark:text-yellow-400"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Ver Usuarios</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Lista completa</p>
-                                </div>
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-cog text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Ajustes</span>
                             </button>
                             
-                            <button class="w-full flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-xl border border-orange-200 dark:border-orange-800 transition-colors group">
-                                <div class="w-10 h-10 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-user-shield text-orange-600 dark:text-orange-400"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-semibold text-gray-900 dark:text-white">Gestionar Permisos</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Roles y accesos</p>
-                                </div>
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-users text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Equipo</span>
+                            </button>
+                            
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-question-circle text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Ayuda</span>
                             </button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Tabla de Usuarios Recientes -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Usuarios Recientes</h3>
-                        <button class="text-sm text-purple-600 dark:text-purple-400 hover:underline font-semibold">Ver todos</button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Usuario</th>
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Rol</th>
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Estado</th>
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <td class="py-3">
-                                        <div class="flex items-center gap-3">
-                                            <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=6366f1&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                            <div>
-                                                <p class="font-medium text-gray-900 dark:text-white">Ana López</p>
-                                                <p class="text-sm text-gray-600 dark:text-gray-400">ana@email.com</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
-                                    </td>
-                                    <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Hoy</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <td class="py-3">
-                                        <div class="flex items-center gap-3">
-                                            <img src="https://ui-avatars.com/api/?name=Carlos+Ruiz&background=10b981&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                            <div>
-                                                <p class="font-medium text-gray-900 dark:text-white">Carlos Ruiz</p>
-                                                <p class="text-sm text-gray-600 dark:text-gray-400">carlos@email.com</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">Profesor</span>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Activo</span>
-                                    </td>
-                                    <td class="py-3 text-sm text-gray-600 dark:text-gray-400">Ayer</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <td class="py-3">
-                                        <div class="flex items-center gap-3">
-                                            <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=f59e0b&color=fff" class="w-8 h-8 rounded-full" alt="">
-                                            <div>
-                                                <p class="font-medium text-gray-900 dark:text-white">María García</p>
-                                                <p class="text-sm text-gray-600 dark:text-gray-400">maria@email.com</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Estudiante</span>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-full">Pendiente</span>
-                                    </td>
-                                    <td class="py-3 text-sm text-gray-600 dark:text-gray-400">15/10/2025</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column - 1/3 width -->
-            <div class="space-y-8">
-                <!-- Métricas del Sistema -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Métricas del Sistema</h3>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600 dark:text-gray-400">Uso de CPU</span>
-                                <span class="text-gray-900 dark:text-white">42%</span>
-                            </div>
-                            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-green-500 rounded-full h-2 transition-all duration-1000" style="width: 42%"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600 dark:text-gray-400">Memoria</span>
-                                <span class="text-gray-900 dark:text-white">68%</span>
-                            </div>
-                            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-blue-500 rounded-full h-2 transition-all duration-1000" style="width: 68%"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600 dark:text-gray-400">Almacenamiento</span>
-                                <span class="text-gray-900 dark:text-white">35%</span>
-                            </div>
-                            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-purple-500 rounded-full h-2 transition-all duration-1000" style="width: 35%"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600 dark:text-gray-400">Uptime</span>
-                                <span class="text-green-600 dark:text-green-400 font-semibold">99.9%</span>
-                            </div>
-                            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-green-500 rounded-full h-2 transition-all duration-1000" style="width: 99.9%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Distribución de Idiomas -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Distribución de Idiomas</h3>
-                    <div id="language-chart" class="h-64"></div>
-                </div>
-
-                <!-- Actividad Reciente -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Actividad Reciente</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-user-plus text-blue-600 dark:text-blue-400 text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">Nuevo usuario registrado</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Ana López se unió hace 2 horas</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                            <div class="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-book text-green-600 dark:text-green-400 text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">Lección completada</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Carlos Ruiz completó "Vocabulario Básico"</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                            <div class="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-chart-line text-purple-600 dark:text-purple-400 text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">Nivel alcanzado</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">María García alcanzó el nivel B1</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Acciones Rápidas -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
-                            <i class="fas fa-download text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Reporte</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
-                            <i class="fas fa-cog text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Ajustes</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
-                            <i class="fas fa-users text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Equipo</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
-                            <i class="fas fa-question-circle text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Ayuda</span>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <script>
-        // ===== GESTIÓN DE TEMA OSCURO/CLARO =====
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.getElementById('theme-icon').className = 'fas fa-moon text-gray-600';
-        }
-
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.theme = 'dark';
-                document.getElementById('theme-icon').className = 'fas fa-sun text-yellow-400';
-            } else {
-                localStorage.theme = 'light';
-                document.getElementById('theme-icon').className = 'fas fa-moon text-gray-600';
-            }
-        });
-
-        // ===== VERIFICACIÓN DE AUTENTICACIÓN =====
-        const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (!usuario || (usuario.rol !== 'admin' && usuario.rol !== 'administrador')) {
-            window.location.href = 'login.html';
-        }
-
-        // ===== GRÁFICOS =====
-        // Gráfico de Actividad
-        const activityOptions = {
-            series: [{
-                name: 'Usuarios Activos',
-                data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 85, 95, 110]
-            }],
-            chart: {
-                height: 350,
-                type: 'line',
-                zoom: {
-                    enabled: false
-                },
-                toolbar: {
-                    show: false
-                }
-            },
-            colors: ['#6366f1'],
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
-            grid: {
-                borderColor: '#e7e7e7',
-                row: {
-                    colors: ['#f3f3f3', 'transparent'],
-                    opacity: 0.5
-                }
-            },
-            markers: {
-                size: 4
-            },
-            xaxis: {
-                categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            },
-            yaxis: {
-                title: {
-                    text: 'Usuarios Activos'
-                }
-            }
-        };
-
-        const activityChart = new ApexCharts(document.querySelector("#activity-chart"), activityOptions);
-        activityChart.render();
-
-        // Gráfico de Idiomas
-        const languageOptions = {
-            series: [44, 55, 41, 17, 15],
-            labels: ['Inglés', 'Francés', 'Portugués', 'Alemán', 'Italiano'],
-            chart: {
-                type: 'donut',
-                height: 350
-            },
-            colors: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }],
-            legend: {
-                position: 'bottom'
-            }
-        };
-
-        const languageChart = new ApexCharts(document.querySelector("#language-chart"), languageOptions);
-        languageChart.render();
-
-        // ===== LOGOUT =====
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        });
-
-        // ===== ACTUALIZAR GRÁFICOS AL CAMBIAR TEMA =====
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            setTimeout(() => {
-                activityChart.update();
-                languageChart.update();
-            }, 100);
-        });
-    </script>
+    <!-- ============================================
+         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/module-loader.js"></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    
+    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <script src="/assets/js/pages/admin/dashboard.js" defer></script>
 </body>
 </html>

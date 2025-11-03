@@ -863,4 +863,4 @@ if (APP_ENV.DEBUG && typeof console !== 'undefined') {
     console.log('📁 Módulos configurados: Usuarios, Lecciones, Aprendizaje, Desempeño, Mantenimiento');
     console.log('✅ Configuración NIVELES agregada correctamente');
     console.log('🎯 Niveles CEFR disponibles: A1, A2, B1, B2, C1, C2');
-}A
+}
