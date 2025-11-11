@@ -1,0 +1,155 @@
+<!--/frontend/pages/estudiante/mis-progresos.html-->
+<!DOCTYPE html>
+<html lang="es" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Progreso - SpeakLexi</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div id="navbar-container"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        <!-- HEADER -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fas fa-chart-line text-primary-600 mr-3"></i>Mi Progreso
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                Visualiza tu evolución y estadísticas de aprendizaje
+            </p>
+        </div>
+
+        <!-- ESTADOS DE CARGA Y ERROR -->
+        <div id="loading-indicator" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+            <p class="text-gray-500 mt-4">Cargando tu progreso...</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 text-center">
+            <i class="fas fa-exclamation-triangle text-red-500 text-xl mb-2"></i>
+            <p class="text-red-700 dark:text-red-300"></p>
+        </div>
+
+        <!-- STATS CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="stats-container">
+            <!-- Las stats cards se cargarán aquí dinámicamente -->
+            <div class="text-center py-8 col-span-full">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                <p class="text-gray-500 mt-4">Cargando estadísticas...</p>
+            </div>
+        </div>
+
+        <!-- GRÁFICO SEMANAL -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-chart-area text-blue-500"></i>Actividad Semanal
+                </h2>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <i class="fas fa-sync-alt mr-1"></i>Actualizado hoy
+                </div>
+            </div>
+            <div class="h-80">
+                <canvas id="graficoSemanal"></canvas>
+            </div>
+            <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                <p>XP ganado por día de la semana</p>
+            </div>
+        </div>
+
+        <!-- LECCIONES + HISTORIAL -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- LECCIONES -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-book-open text-green-500"></i>Mis Lecciones
+                    </h2>
+                    <span class="text-sm text-gray-600 dark:text-gray-400" id="contador-lecciones">
+                        <span id="lecciones-totales">-</span> lecciones
+                    </span>
+                </div>
+                <div id="lista-lecciones" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    <!-- La lista de lecciones se cargará aquí dinámicamente -->
+                    <div class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                        <p class="text-gray-500 mt-4">Cargando lecciones...</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-semibold transition-colors">
+                        <i class="fas fa-arrow-right mr-1"></i>Ver todas las lecciones
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORIAL -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-history text-purple-500"></i>Historial Reciente
+                    </h2>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        Últimos 10 actividades
+                    </span>
+                </div>
+                <div id="tabla-historial" class="max-h-96 overflow-hidden">
+                    <!-- La tabla de historial se cargará aquí dinámicamente -->
+                    <div class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                        <p class="text-gray-500 mt-4">Cargando historial...</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-semibold transition-colors">
+                        <i class="fas fa-list mr-1"></i>Ver historial completo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMEN MENSUAL -->
+        <div class="mt-8 bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-2xl p-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+                <i class="fas fa-calendar-check text-primary-600 mr-2"></i>Resumen del Mes
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                    <p class="text-2xl font-bold text-primary-600 dark:text-primary-400" id="resumen-mes-lecciones">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Este Mes</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400" id="resumen-mes-xp">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">XP Ganados</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="resumen-mes-tiempo">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Horas Estudiadas</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="resumen-mes-dias">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Días Activos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    <script src="/assets/js/pages/estudiante/progreso.js" defer></script>
+</body>
+</html>

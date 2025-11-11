@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-07 14:11:07
+# RAW LINKS — Actualizado 2025-11-10 19:56:46
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: e6b661ea4a7d81d0a545a5fcc9255851b8a717ac
+# Commit: d06c58f75ff3e3c8e3bcac1bd4ee7fbde89aafe0
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -67,6 +67,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/auth/verificar-email.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/cambiar-curso.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/dashboard.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/leccion-activa.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/estudiante/perfil.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/onboarding/asignar-nivel.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/diag.html
@@ -98,6 +99,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/utils/validators.js
 
 ========================= DOCS LINKS =========================
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/CLAUDE.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/GUIDELINES.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 1/README.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/README.md

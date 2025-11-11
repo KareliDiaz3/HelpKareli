@@ -1,0 +1,120 @@
+<!--/frontend/pages/estudiante/mis-progresos.html-->
+<!DOCTYPE html>
+<html lang="es" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación - SpeakLexi</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div id="navbar-container"></div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        <!-- HEADER -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fas fa-trophy text-yellow-500 mr-3"></i>Clasificación
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                Compite con otros estudiantes y alcanza los primeros puestos
+            </p>
+        </div>
+
+        <!-- ESTADOS DE CARGA Y ERROR -->
+        <div id="loading-indicator" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+            <p class="text-gray-500 mt-4">Cargando clasificación...</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 text-center">
+            <i class="fas fa-exclamation-triangle text-red-500 text-xl mb-2"></i>
+            <p class="text-red-700 dark:text-red-300"></p>
+        </div>
+
+        <!-- TABS -->
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-2">
+            <nav class="flex space-x-1" role="tablist">
+                <button class="tab-btn active px-6 py-3 rounded-xl font-semibold transition-all duration-300 
+                              bg-primary-500 text-white shadow-lg transform scale-105" 
+                        data-tipo="global" role="tab">
+                    <i class="fas fa-globe mr-2"></i>Global
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-400 
+                              hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 
+                              hover:bg-gray-100 dark:hover:bg-gray-700" 
+                        data-tipo="semanal" role="tab">
+                    <i class="fas fa-calendar-week mr-2"></i>Semanal
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-400 
+                              hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 
+                              hover:bg-gray-100 dark:hover:bg-gray-700" 
+                        data-tipo="mensual" role="tab">
+                    <i class="fas fa-calendar-alt mr-2"></i>Mensual
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-400 
+                              hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 
+                              hover:bg-gray-100 dark:hover:bg-gray-700" 
+                        data-tipo="nivel" role="tab">
+                    <i class="fas fa-layer-group mr-2"></i>Por Nivel
+                </button>
+            </nav>
+        </div>
+
+        <!-- MI POSICIÓN -->
+        <div class="bg-gradient-to-r from-primary-500 via-purple-600 to-blue-600 rounded-2xl shadow-xl p-6 text-white mb-8 transform hover:scale-[1.02] transition-transform duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl font-bold bg-white/20 rounded-full w-16 h-16 flex items-center justify-center">
+                        #<span id="mi-posicion-numero">-</span>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold">Tu Posición</p>
+                        <p class="opacity-90 mt-1" id="mi-posicion-datos">Cargando...</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold" id="mi-posicion-xp">- XP</div>
+                    <p class="text-sm opacity-90 mt-1" id="mi-posicion-percentil">Top -%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RANKING TOP -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-crown text-yellow-500"></i>
+                <span id="ranking-titulo">Ranking Global</span>
+            </h2>
+            
+            <div id="ranking-container" class="space-y-3">
+                <!-- Los elementos del ranking se cargarán aquí dinámicamente -->
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                    <p class="text-gray-500 mt-4">Cargando ranking...</p>
+                </div>
+            </div>
+
+            <!-- PIE DE RANKING -->
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Actualizado hace unos momentos • 
+                    <span id="ranking-total">-</span> estudiantes en total
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    <script src="/assets/js/pages/estudiante/leaderboard.js" defer></script>
+</body>
+</html>

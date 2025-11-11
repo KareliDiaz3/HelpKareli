@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - SpeakLexi</title>
+    
+    <!-- ✅ PRELOAD CRÍTICO -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="/assets/css/custom-styles.css" as="style">
+    
+    <!-- ✅ CSS EXTERNO -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ TAILWIND CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configuración inline de Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- ✅ CSS INTERNO -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+    
+    <!-- ✅ CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ✅ META OPTIMIZACIÓN -->
+    <meta name="description" content="SpeakLexi - Panel del Profesor">
+    <meta name="theme-color" content="#4F46E5">
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- ✅ NAVBAR DINÁMICO -->
+    <div id="navbar-container"></div>
+    
+    <!-- ✅ CONTENIDO PRINCIPAL -->
+    <main class="min-h-screen pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel del Profesor</h2>
+                <p class="text-gray-600 dark:text-gray-300">Gestión de estudiantes y seguimiento del progreso</p>
+                
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span>Profesor</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="text-primary-600 dark:text-primary-400">Dashboard</span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group cursor-pointer" data-stat="alumnos">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Alumnos</p>
+                            <p class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">45</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>5% este mes
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group cursor-pointer" data-stat="lecciones">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Activas</p>
+                            <p class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">12</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">+2 esta semana</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-book-open text-green-600 dark:text-green-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group cursor-pointer" data-stat="retroalimentacion">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Retroalimentación Pendiente</p>
+                            <p class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">8</p>
+                            <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+                                <i class="fas fa-exclamation-circle mr-1"></i>Necesita atención
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-comment-dots text-orange-600 dark:text-orange-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group cursor-pointer" data-stat="progreso">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Progreso Promedio</p>
+                            <p class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">72%</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                <i class="fas fa-chart-line mr-1"></i>+5% este mes
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chart-pie text-purple-600 dark:text-purple-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <!-- Left Column -->
+                <div class="xl:col-span-2 space-y-8">
+                    <!-- Gráficos de Progreso -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Gráfico de Progreso de la Clase -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Progreso de la Clase</h3>
+                            <div class="h-64">
+                                <canvas id="progress-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de Rendimiento por Habilidad -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Rendimiento por Habilidad</h3>
+                            <div class="h-64">
+                                <canvas id="performance-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gestión Rápida -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Gestión de Estudiantes -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Gestión de Estudiantes</h3>
+                            <div class="space-y-3">
+                                <button class="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors group" data-action="gestion-alumnos">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-user-graduate text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Ver Todos los Alumnos</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Lista completa de estudiantes</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-xl border border-green-200 dark:border-green-800 transition-colors group" data-action="retroalimentacion">
+                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-comment-medical text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Dar Retroalimentación</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Revisar ejercicios pendientes</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-800 transition-colors group" data-action="planificacion">
+                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-calendar-alt text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Planificar Lecciones</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Crear nuevas actividades</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Análisis y Reportes -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Análisis y Reportes</h3>
+                            <div class="space-y-3">
+                                <button class="w-full flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-xl border border-yellow-200 dark:border-yellow-800 transition-colors group" data-action="estadisticas">
+                                    <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-chart-bar text-yellow-600 dark:text-yellow-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Estadísticas Detalladas</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Ver métricas avanzadas</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl border border-red-200 dark:border-red-800 transition-colors group">
+                                    <div class="w-10 h-10 bg-red-100 dark:bg-red-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-file-pdf text-red-600 dark:text-red-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Generar Reportes</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Exportar datos de progreso</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-xl border border-indigo-200 dark:border-indigo-800 transition-colors group" data-action="gestion-contenido">
+                                    <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-800 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-edit text-indigo-600 dark:text-indigo-400"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-gray-900 dark:text-white">Gestionar Contenido</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Crear/editar materiales</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Actividad Semanal -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Actividad Semanal de la Clase</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-lg">7 días</button>
+                                <button class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">30 días</button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="activity-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-8">
+                    <!-- Alumnos Recientes -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Alumnos Recientes</h3>
+                            <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver todos</button>
+                        </div>
+                        
+                        <div id="recent-students" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Métricas de la Clase -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Métricas de la Clase</h3>
+                        
+                        <div id="class-metrics">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Tareas Pendientes -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Tareas Pendientes</h3>
+                            <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver todas</button>
+                        </div>
+                        
+                        <div id="pending-tasks" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Próximas Lecciones -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Próximas Lecciones</h3>
+                            <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">Ver calendario</button>
+                        </div>
+                        
+                        <div id="upcoming-lessons" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-comment-medical text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Retroalimentación</span>
+                            </button>
+                            
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-calendar-plus text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Planificación</span>
+                            </button>
+                            
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-chart-line text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Estadísticas</span>
+                            </button>
+                            
+                            <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group">
+                                <i class="fas fa-book text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400"></i>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Contenido</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================
+         ORDEN DE CARGA CORREGIDO
+    ============================================ -->
+    
+    <!-- 1️⃣ CONFIGURACIÓN GLOBAL -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- 2️⃣ CORE MODULES -->
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/core/api-client.js"></script>
+    <script src="/assets/js/core/form-validator.js"></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/theme-manager.js"></script>
+    
+    <!-- 3️⃣ MÓDULOS ADICIONALES -->
+    <script src="/assets/js/core/module-loader.js"></script>
+    <script src="/assets/js/core/navbar-loader.js"></script>
+    
+    <!-- 4️⃣ LÓGICA DE PÁGINA (al final) -->
+    <script src="/assets/js/pages/profesor/dashboard.js"></script>
+</body>
+</html>

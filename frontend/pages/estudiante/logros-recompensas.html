@@ -1,0 +1,143 @@
+<!--/frontend/pages/estudiante/logros-recompensas.html-->
+<!DOCTYPE html>
+<html lang="es" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logros y Recompensas - SpeakLexi</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/core/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div id="navbar-container"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        <!-- HEADER -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fas fa-medal text-yellow-500 mr-3"></i>Logros y Recompensas
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                Desbloquea logros y gana recompensas por tu progreso
+            </p>
+        </div>
+
+        <!-- ESTADOS DE CARGA Y ERROR -->
+        <div id="loading-indicator" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+            <p class="text-gray-500 mt-4">Cargando logros...</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 text-center">
+            <i class="fas fa-exclamation-triangle text-red-500 text-xl mb-2"></i>
+            <p class="text-red-700 dark:text-red-300"></p>
+        </div>
+
+        <!-- PERFIL GAMIFICACIÓN -->
+        <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white mb-8 transform hover:scale-[1.01] transition-transform duration-300">
+            <div class="text-center">
+                <div class="text-6xl font-bold mb-2 animate-pulse">Nivel <span id="nivel-actual">-</span></div>
+                <p class="text-xl mb-1"><span id="xp-actual">-</span> XP</p>
+                <p class="text-sm opacity-90 mb-6" id="nivel-cefr">Cargando...</p>
+                
+                <div class="bg-white/20 rounded-full h-4 mb-3 max-w-2xl mx-auto">
+                    <div class="bg-white rounded-full h-4 transition-all duration-1000 ease-out" 
+                         style="width: 0%" id="barra-progreso"></div>
+                </div>
+                
+                <div class="flex justify-between text-sm max-w-2xl mx-auto px-4">
+                    <span>Nivel <span id="nivel-inicio">-</span></span>
+                    <span class="opacity-90" id="xp-faltante">- XP para el siguiente</span>
+                    <span>Nivel <span id="nivel-siguiente">-</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGROS -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    <i class="fas fa-trophy text-yellow-500 mr-3"></i>Mis Logros
+                </h2>
+                <div class="text-sm text-gray-600 dark:text-gray-400" id="contador-logros">
+                    <span id="logros-desbloqueados">0</span>/<span id="logros-totales">0</span> desbloqueados
+                </div>
+            </div>
+            
+            <div id="logros-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Los logros se cargarán aquí dinámicamente -->
+                <div class="text-center py-12 col-span-full">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                    <p class="text-gray-500 mt-4">Cargando logros...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- RACHA ACTUAL -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-fire text-orange-500"></i>Racha Actual
+                </h2>
+                
+                <div id="racha-visualizacion" class="text-center">
+                    <!-- La visualización de racha se cargará aquí dinámicamente -->
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                    <p class="text-gray-500 mt-4">Cargando racha...</p>
+                </div>
+            </div>
+
+            <!-- PRÓXIMAS RECOMPENSAS -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-gift text-green-500"></i>Próximas Recompensas
+                </h2>
+                
+                <div id="proximas-recompensas">
+                    <!-- Las próximas recompensas se cargarán aquí dinámicamente -->
+                    <div class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                        <p class="text-gray-500 mt-4">Cargando recompensas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS ADICIONALES -->
+        <div class="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+                <i class="fas fa-chart-bar text-primary-500 mr-2"></i>Estadísticas de Progreso
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                    <p class="text-2xl font-bold text-primary-600 dark:text-primary-400" id="stats-lecciones">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Completadas</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400" id="stats-cursos">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Cursos Completados</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="stats-tiempo">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Horas de Estudio</p>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="stats-racha-max">-</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Racha Máxima</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/utils.js" async></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/toast-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js" async></script>
+    <script src="/assets/js/pages/estudiante/logros.js" defer></script>
+</body>
+</html>
