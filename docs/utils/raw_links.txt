@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-11 14:25:42
+# RAW LINKS — Actualizado 2025-11-11 23:05:09
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: f181006fb6300246c3112bc28f3fcf8fc1619279
+# Commit: 590e73b5e503b0df5fcb5459f05f2fa515e5eead
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js
@@ -25,11 +25,13 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/mult
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/planificacionRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/progresoRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/retroalimentacionRoutes.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/routes/testingRoutes.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/scripts/crear-admin.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/server.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 3/README_RAPIDO.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/API-REFERENCE.md
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/MODULO 4/README_RAPIDO.md
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/crear-lecciones.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/docs/utils/generar-links.py
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/api-client.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/core/tailwind-config.js
@@ -95,6 +97,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/estadisticas-profesor.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/planificacion.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/profesor/retroalimentacion-profesor.js
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/assets/js/pages/testing/generador-datos.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/diag.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/index.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/admin/admin-dashboard.html
@@ -120,6 +123,7 @@ https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/prof
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/profesor/planificacion.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/profesor/profesor-dashboard.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/profesor/retroalimentacion-profesor.html
+https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/pages/testing/generar-datos.html
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/css/main.css
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/auth.js
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/frontend/public/js/components/login-form.js

@@ -47,387 +47,75 @@ Panel de control principal para estudiantes después de iniciar sesión.
             </div>
         </div>
 
-        <!-- Stats Cards Mejoradas -->
+        <!-- ✅ STATS CARDS CONECTADAS A API -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Racha Actual -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Racha Actual</p>
-                        <p class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1" id="dias-racha">0</p>
+                        <p class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1" id="dias-racha-stat">0</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">días seguidos</p>
                     </div>
                     <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <i class="fas fa-fire text-orange-600 dark:text-orange-400 text-2xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div class="bg-orange-500 rounded-full h-2 transition-all duration-1000" style="width: 80%"></div>
-                </div>
             </div>
 
+            <!-- XP Total -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">XP Total</p>
-                        <p class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1" id="total-xp">0</p>
+                        <p class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1" id="total-xp-stat">0</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">puntos acumulados</p>
                     </div>
                     <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <i class="fas fa-star text-purple-600 dark:text-purple-400 text-2xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div class="bg-purple-500 rounded-full h-2 transition-all duration-1000" style="width: 65%"></div>
-                    </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">65%</span>
-                </div>
             </div>
 
+            <!-- Lecciones Completadas -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones</p>
-                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1" id="lecciones-completadas">0</p>
+                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1" id="lecciones-completadas-stat">0</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">completadas</p>
                     </div>
                     <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <i class="fas fa-book text-blue-600 dark:text-blue-400 text-2xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center justify-between text-sm">
-                    <span class="text-gray-500 dark:text-gray-400">Objetivo: 50</span>
-                    <span class="text-blue-600 dark:text-blue-400 font-semibold">70%</span>
-                </div>
             </div>
 
+            <!-- Nivel Actual -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Nivel</p>
-                        <p class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1" id="nivel-usuario">1</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="nivel-actual">A1 - Principiante</p>
+                        <p class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1" id="nivel-usuario-stat">A1</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="idioma-aprendizaje-stat">Inglés</p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-2xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div class="bg-gradient-to-r from-green-400 to-green-600 rounded-full h-2 transition-all duration-1000" style="width: 35%"></div>
-                    </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">35%</span>
-                </div>
             </div>
         </div>
 
-        <!-- Main Grid Mejorado -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            <!-- Left Column - 2/3 width -->
-            <div class="xl:col-span-2 space-y-8">
-                <!-- Continue Learning Card Mejorada -->
-                <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-xl p-6 text-white transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden">
-                    <!-- Efecto de partículas de fondo -->
-                    <div class="absolute inset-0 opacity-10">
-                        <div class="absolute top-4 left-4 w-8 h-8 bg-white rounded-full"></div>
-                        <div class="absolute bottom-8 right-8 w-12 h-12 bg-white rounded-full"></div>
-                        <div class="absolute top-1/2 left-1/4 w-6 h-6 bg-white rounded-full"></div>
-                    </div>
-                    
-                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
-                        <div class="flex-1">
-                            <h3 class="text-2xl font-bold mb-2">¡Continúa tu aprendizaje!</h3>
-                            <p class="text-purple-100 mb-4">Estás a punto de alcanzar el siguiente nivel. No te detengas ahora.</p>
-                            
-                            <div class="space-y-3">
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span>Progreso del curso</span>
-                                        <span>35%</span>
-                                    </div>
-                                    <div class="bg-white/20 rounded-full h-3">
-                                        <div class="bg-white rounded-full h-3 transition-all duration-1000" style="width: 35%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm opacity-90">Curso actual</p>
-                                        <p class="text-xl font-bold" id="idioma-aprendizaje">Inglés</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-sm opacity-90">Siguiente nivel</p>
-                                        <p class="text-xl font-bold">A2</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex-shrink-0">
-                            <button class="w-full lg:w-auto bg-white text-purple-600 font-semibold py-4 px-8 rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105">
-                                <i class="fas fa-play"></i>
-                                <span>Continuar Lección</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <!-- ✅ CONTENEDOR DINÁMICO PARA DATOS DE API -->
+        <div id="contenido-dashboard" class="hidden">
+            <!-- El contenido se genera dinámicamente desde dashboard.js -->
+        </div>
 
-                <!-- Two Column Grid for Daily Goal and Progress -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Daily Goal Card Mejorada -->
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Meta Diaria</h3>
-                            <span class="text-sm text-gray-600 dark:text-gray-400" id="meta-diaria">30 min</span>
-                        </div>
-                        
-                        <!-- Circular Progress -->
-                        <div class="relative w-32 h-32 mx-auto mb-4">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <path class="text-gray-200 dark:text-gray-700" 
-                                      d="M18 2.0845
-                                        a 15.9155 15.9155 0 0 1 0 31.831
-                                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                                      fill="none" stroke="currentColor" stroke-width="3"/>
-                                <path class="text-green-500" 
-                                      d="M18 2.0845
-                                        a 15.9155 15.9155 0 0 1 0 31.831
-                                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                                      fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="60, 100"
-                                      stroke-linecap="round"/>
-                                <text x="18" y="20.5" class="text-4px font-bold fill-current text-gray-900 dark:text-white" text-anchor="middle" transform="rotate(90 18 18)">18/30</text>
-                            </svg>
-                        </div>
-                        
-                        <p class="text-center text-sm text-gray-600 dark:text-gray-400">18 de 30 minutos completados hoy</p>
-                    </div>
-
-                    <!-- Weekly Progress Card -->
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Progreso Semanal</h3>
-                        
-                        <div class="space-y-4">
-                            <!-- Bar Chart -->
-                            <div class="flex items-end justify-between h-24">
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 40%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Lun</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 60%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Mar</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 80%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Mié</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 70%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Jue</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 90%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Vie</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 50%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Sáb</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="w-6 bg-blue-500 rounded-t-lg mb-1 transition-all duration-500 hover:bg-blue-600 cursor-pointer" style="height: 30%"></div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">Dom</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600 dark:text-gray-400">Esta semana</span>
-                                <span class="text-blue-600 dark:text-blue-400 font-semibold">+12% vs semana pasada</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Lessons Mejorada -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecciones Recientes</h3>
-                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todas</button>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-900 dark:text-white">Saludos y Presentaciones</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Completado - 100 XP</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-2xl">✅</span>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hoy</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i class="fas fa-play text-purple-600 dark:text-purple-400 text-lg"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-900 dark:text-white">Vocabulario Básico</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">En progreso - 45%</p>
-                                <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                                    <div class="bg-purple-500 rounded-full h-2 transition-all duration-1000" style="width: 45%"></div>
-                                </div>
-                            </div>
-                            <span class="text-2xl">📖</span>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-lock text-gray-400 dark:text-gray-500 text-lg"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-400 dark:text-gray-500">Números y Colores</p>
-                                <p class="text-sm text-gray-400 dark:text-gray-500">Desbloquea al completar Vocabulario Básico</p>
-                            </div>
-                            <span class="text-2xl opacity-50">🔒</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NUEVO CONTENEDOR PARA LECCIONES DINÁMICAS -->
-                <div id="lecciones-container" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <!-- Las lecciones se cargan dinámicamente desde dashboard.js -->
-                </div>
-            </div>
-
-            <!-- Right Column - 1/3 width -->
-            <div class="space-y-8">
-                <!-- Leaderboard Mejorado -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Clasificación Global</h3>
-                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver ranking completo</button>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <!-- Top 3 with special styling -->
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 hover:shadow-md transition-all transform hover:-translate-y-0.5">
-                            <span class="text-2xl font-bold text-yellow-500">🥇</span>
-                            <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=fbbf24&color=fff" class="w-10 h-10 rounded-full border-2 border-yellow-400" alt="">
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-900 dark:text-white">Ana López</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">2,450 XP</p>
-                            </div>
-                            <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
-                                <span class="text-sm font-bold text-yellow-600 dark:text-yellow-400">1</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 transform hover:-translate-y-0.5">
-                            <span class="text-xl font-bold text-gray-400">🥈</span>
-                            <img src="https://ui-avatars.com/api/?name=Carlos+Ruiz&background=9ca3af&color=fff" class="w-8 h-8 rounded-full" alt="">
-                            <div class="flex-1">
-                                <p class="font-semibold text-sm text-gray-900 dark:text-white">Carlos Ruiz</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">2,180 XP</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 transform hover:-translate-y-0.5">
-                            <span class="text-xl font-bold text-orange-600">🥉</span>
-                            <img src="https://ui-avatars.com/api/?name=Maria+Garcia&background=ea580c&color=fff" class="w-8 h-8 rounded-full" alt="">
-                            <div class="flex-1">
-                                <p class="font-semibold text-sm text-gray-900 dark:text-white">María García</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">1,920 XP</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Current User Highlighted -->
-                        <div class="flex items-center gap-4 p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 border-2 border-primary-200 dark:border-primary-800 hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
-                            <span class="text-lg font-bold text-primary-600 dark:text-primary-400">4</span>
-                            <img src="https://ui-avatars.com/api/?name=Usuario&background=6366f1&color=fff" class="w-8 h-8 rounded-full border-2 border-primary-500" alt="" id="leaderboard-avatar">
-                            <div class="flex-1">
-                                <p class="font-semibold text-sm text-primary-600 dark:text-primary-400">Tú</p>
-                                <p class="text-xs text-primary-500 dark:text-primary-400" id="leaderboard-xp">1,850 XP</p>
-                            </div>
-                            <div class="text-xs bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-400 px-2 py-1 rounded-full">
-                                +5 hoy
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Achievements Mejorado -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros Recientes</h3>
-                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todos</button>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span class="text-2xl">🎯</span>
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-900 dark:text-white">Primera Racha</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">3 días seguidos</p>
-                                <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
-                                    <i class="fas fa-gem"></i>
-                                    <span>+50 XP</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span class="text-xl">⭐</span>
-                            </div>
-                            <div>
-                                <p class="font-semibold text-sm text-gray-900 dark:text-white">100 Puntos</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Alcanzaste 100 XP</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5">
-                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span class="text-xl">📚</span>
-                            </div>
-                            <div>
-                                <p class="font-semibold text-sm text-gray-900 dark:text-white">Primera Lección</p>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Completaste tu primera lección</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
-                            <i class="fas fa-search text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Buscar Lecciones</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
-                            <i class="fas fa-download text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Descargar PDF</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
-                            <i class="fas fa-users text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Comunidad</span>
-                        </button>
-                        
-                        <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group transform hover:-translate-y-0.5">
-                            <i class="fas fa-question-circle text-gray-600 dark:text-gray-400 text-xl mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">Ayuda</span>
-                        </button>
-                    </div>
-                </div>
+        <!-- ✅ LOADING STATE -->
+        <div id="loading-dashboard" class="flex items-center justify-center py-12">
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+                <p class="text-gray-600 dark:text-gray-400">Cargando tu dashboard...</p>
             </div>
         </div>
     </div>
