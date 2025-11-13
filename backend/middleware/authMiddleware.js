@@ -1,5 +1,5 @@
 // ==========================================================
-// backend/middleware/authMiddleware.js - CORREGIDO
+// backend/middleware/authMiddleware.js - COMPLETO CON MÓDULO 4
 // Middleware de autenticación y autorización
 // ==========================================================
 
@@ -323,6 +323,85 @@ const rateLimitPorUsuario = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
 };
 
 // ==========================================================
+// MIDDLEWARES ESPECÍFICOS PARA MÓDULO 4
+// ==========================================================
+
+/**
+ * Middleware para verificar que el usuario es profesor
+ * @access Private (Profesor only)
+ */
+const verificarProfesor = (req, res, next) => {
+    // Verificar que el usuario esté autenticado
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Usuario no autenticado',
+            codigo: 'UNAUTHENTICATED'
+        });
+    }
+
+    if (req.user.rol !== 'profesor') {
+        return res.status(403).json({
+            error: 'Acceso denegado. Solo profesores pueden acceder a este recurso.',
+            codigo: 'PROFESOR_REQUIRED',
+            tu_rol: req.user.rol
+        });
+    }
+
+    console.log(`✅ Acceso de profesor permitido: ${req.user.id}`);
+    next();
+};
+
+/**
+ * Middleware para verificar que el usuario es estudiante
+ * @access Private (Estudiante only)
+ */
+const verificarEstudiante = (req, res, next) => {
+    // Verificar que el usuario esté autenticado
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Usuario no autenticado',
+            codigo: 'UNAUTHENTICATED'
+        });
+    }
+
+    if (req.user.rol !== 'alumno') {
+        return res.status(403).json({
+            error: 'Acceso denegado. Solo estudiantes pueden acceder a este recurso.',
+            codigo: 'ESTUDIANTE_REQUIRED',
+            tu_rol: req.user.rol
+        });
+    }
+
+    console.log(`✅ Acceso de estudiante permitido: ${req.user.id}`);
+    next();
+};
+
+/**
+ * Middleware para verificar que el usuario es administrador
+ * @access Private (Admin only)
+ */
+const verificarAdmin = (req, res, next) => {
+    // Verificar que el usuario esté autenticado
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Usuario no autenticado',
+            codigo: 'UNAUTHENTICATED'
+        });
+    }
+
+    if (req.user.rol !== 'admin') {
+        return res.status(403).json({
+            error: 'Acceso denegado. Solo administradores pueden acceder a este recurso.',
+            codigo: 'ADMIN_REQUIRED',
+            tu_rol: req.user.rol
+        });
+    }
+
+    console.log(`✅ Acceso de administrador permitido: ${req.user.id}`);
+    next();
+};
+
+// ==========================================================
 // EXPORTAR MIDDLEWARES
 // ==========================================================
 
@@ -332,5 +411,9 @@ module.exports = {
     verificarEmail,
     verificarPropioUsuarioOAdmin,
     logRequests,
-    rateLimitPorUsuario
+    rateLimitPorUsuario,
+    // Middlewares específicos del Módulo 4
+    verificarProfesor,
+    verificarEstudiante,
+    verificarAdmin
 };

@@ -134,6 +134,11 @@
                     </div>
 
                     <div class="flex gap-3">
+                        <!-- ✅ CORREGIDO: Agregar botón de recargar que el JavaScript espera -->
+                        <button id="btn-recargar" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                            <i class="fas fa-sync-alt"></i>
+                            Recargar
+                        </button>
                         <button id="btn-filtrar" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
                             <i class="fas fa-filter"></i>
                             Aplicar Filtros
@@ -165,229 +170,267 @@
                 </div>
             </div>
 
-            <!-- Estadísticas Generales -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Alumnos</p>
-                            <p id="total-alumnos" class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">0</p>
-                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
-                                <i class="fas fa-arrow-up mr-1"></i>Activos
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Completadas</p>
-                            <p id="lecciones-completadas" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">0</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Este período</p>
-                        </div>
-                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-book text-green-600 dark:text-green-400 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">XP Promedio</p>
-                            <p id="xp-promedio" class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">0</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Por alumno</p>
-                        </div>
-                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-star text-orange-600 dark:text-orange-400 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Tasa de Completación</p>
-                            <p id="tasa-completacion" class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">0%</p>
-                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
-                                <i class="fas fa-chart-line mr-1"></i>+5% vs mes anterior
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-chart-pie text-purple-600 dark:text-purple-400 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
+            <!-- ✅ NUEVO: Estado Sin Datos -->
+            <div id="estado-sin-datos" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center border border-gray-100 dark:border-gray-700 mb-8">
+                <!-- Se llenará dinámicamente -->
             </div>
 
-            <!-- Gráficos Principales -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <!-- Gráfico de Progreso por Niveles -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Progreso por Niveles CEFR</h3>
-                    <div class="h-80">
-                        <canvas id="grafico-progreso-niveles"></canvas>
+            <!-- ✅ CORREGIDO: Contenedor de Estadísticas (se oculta cuando no hay datos) -->
+            <div id="contenedor-estadisticas">
+                <!-- Estadísticas Generales - CORREGIDO: Cambiado a grid de 3 columnas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Alumnos</p>
+                                <p id="total-alumnos" class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">0</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                    <i class="fas fa-arrow-up mr-1"></i>Activos
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Completadas</p>
+                                <p id="lecciones-completadas" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">0</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Este período</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book text-green-600 dark:text-green-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">XP Promedio</p>
+                                <p id="xp-promedio" class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">0</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Por alumno</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-star text-orange-600 dark:text-orange-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Tasa de Completación</p>
+                                <p id="tasa-completacion" class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">0%</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                    <i class="fas fa-chart-line mr-1"></i>+5% vs mes anterior
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-chart-pie text-purple-600 dark:text-purple-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ NUEVO: Tarjeta de Tiempo Promedio -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Tiempo Promedio</p>
+                                <p id="tiempo-promedio" class="text-3xl font-bold text-indigo-600 dark:text-indigo-500 mt-1">0h</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Por alumno</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-indigo-600 dark:text-indigo-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ NUEVO: Tarjeta de Alumnos Activos -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Alumnos Activos</p>
+                                <p id="alumnos-activos" class="text-3xl font-bold text-pink-600 dark:text-pink-500 mt-1">0</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                    <i class="fas fa-user-check mr-1"></i>Últimos 7 días
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-user-friends text-pink-600 dark:text-pink-400 text-2xl"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Gráfico de Distribución de Habilidades -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Distribución de Habilidades</h3>
-                    <div class="h-80">
-                        <canvas id="grafico-distribucion-habilidades"></canvas>
+                <!-- Gráficos Principales -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Gráfico de Progreso por Niveles -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Progreso por Niveles CEFR</h3>
+                        <div class="h-80">
+                            <canvas id="grafico-progreso-niveles"></canvas>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Gráfico de Tendencia Mensual -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 mb-8">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Tendencia Mensual</h3>
-                <div class="h-96">
-                    <canvas id="grafico-tendencia-mensual"></canvas>
-                </div>
-            </div>
-
-            <!-- Tablas de Detalle -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Tabla de Mejores Alumnos -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Mejores Alumnos</h3>
-                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">
-                            Ver ranking completo
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">#</th>
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Alumno</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Nivel</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">XP Total</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Lecciones</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Racha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-mejores-alumnos">
-                                <!-- Se llenará dinámicamente -->
-                                <tr>
-                                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                                        <i class="fas fa-spinner fa-spin text-xl mb-2"></i>
-                                        <p>Cargando datos...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Gráfico de Distribución de Habilidades -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Distribución de Habilidades</h3>
+                        <div class="h-80">
+                            <canvas id="grafico-distribucion-habilidades"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tabla de Áreas Críticas -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Áreas que Necesitan Atención</h3>
-                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">
-                            Ver análisis detallado
-                        </button>
+                <!-- Gráfico de Tendencia Mensual -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 mb-8">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Tendencia Mensual</h3>
+                    <div class="h-96">
+                        <canvas id="grafico-tendencia-mensual"></canvas>
                     </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Habilidad</th>
-                                    <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Progreso</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Alumnos Afectados</th>
-                                    <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Criticidad</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-areas-criticas">
-                                <!-- Se llenará dinámicamente -->
-                                <tr>
-                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">
-                                        <i class="fas fa-spinner fa-spin text-xl mb-2"></i>
-                                        <p>Cargando datos...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Información Adicional -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Consejos para Mejora -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
-                    <div class="flex items-center gap-3 mb-4">
-                        <i class="fas fa-lightbulb text-blue-600 dark:text-blue-400 text-xl"></i>
-                        <h3 class="font-semibold text-blue-800 dark:text-blue-300">Consejos para Mejora</h3>
-                    </div>
-                    <ul class="space-y-2 text-sm text-blue-700 dark:text-blue-400">
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Enfócate en ejercicios de conversación para mejorar la habilidad oral
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Asigna prácticas de escritura para los estudiantes con nivel B1+
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check text-xs"></i>
-                            Recomienda materiales de lectura complementaria
-                        </li>
-                    </ul>
                 </div>
 
-                <!-- Próximas Evaluaciones -->
-                <div class="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800">
-                    <div class="flex items-center gap-3 mb-4">
-                        <i class="fas fa-calendar-check text-green-600 dark:text-green-400 text-xl"></i>
-                        <h3 class="font-semibold text-green-800 dark:text-green-300">Próximas Evaluaciones</h3>
+                <!-- Tablas de Detalle -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Tabla de Mejores Alumnos -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Mejores Alumnos</h3>
+                            <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">
+                                Ver ranking completo
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">#</th>
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Alumno</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Nivel</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">XP Total</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Lecciones</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Racha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-mejores-alumnos">
+                                    <!-- Se llenará dinámicamente -->
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                            <i class="fas fa-spinner fa-spin text-xl mb-2"></i>
+                                            <p>Cargando datos...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <ul class="space-y-3 text-sm text-green-700 dark:text-green-400">
-                        <li class="flex justify-between items-center">
-                            <span>Evaluación Nivel B1</span>
-                            <span class="font-medium">15 Nov</span>
-                        </li>
-                        <li class="flex justify-between items-center">
-                            <span>Práctica Oral Grupal</span>
-                            <span class="font-medium">22 Nov</span>
-                        </li>
-                        <li class="flex justify-between items-center">
-                            <span>Examen Final</span>
-                            <span class="font-medium">10 Dic</span>
-                        </li>
-                    </ul>
+
+                    <!-- Tabla de Áreas Críticas -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Áreas que Necesitan Atención</h3>
+                            <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold">
+                                Ver análisis detallado
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Habilidad</th>
+                                        <th class="text-left py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Progreso</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Alumnos Afectados</th>
+                                        <th class="text-center py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Criticidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-areas-criticas">
+                                    <!-- Se llenará dinámicamente -->
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                            <i class="fas fa-spinner fa-spin text-xl mb-2"></i>
+                                            <p>Cargando datos...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Acciones Rápidas -->
-                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800">
-                    <div class="flex items-center gap-3 mb-4">
-                        <i class="fas fa-bolt text-purple-600 dark:text-purple-400 text-xl"></i>
-                        <h3 class="font-semibold text-purple-800 dark:text-purple-300">Acciones Rápidas</h3>
+                <!-- Información Adicional -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Consejos para Mejora -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-lightbulb text-blue-600 dark:text-blue-400 text-xl"></i>
+                            <h3 class="font-semibold text-blue-800 dark:text-blue-300">Consejos para Mejora</h3>
+                        </div>
+                        <ul class="space-y-2 text-sm text-blue-700 dark:text-blue-400">
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check text-xs"></i>
+                                Enfócate en ejercicios de conversación para mejorar la habilidad oral
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check text-xs"></i>
+                                Asigna prácticas de escritura para los estudiantes con nivel B1+
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check text-xs"></i>
+                                Recomienda materiales de lectura complementaria
+                            </li>
+                        </ul>
                     </div>
-                    <div class="space-y-2">
-                        <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
-                            <i class="fas fa-plus-circle mr-2"></i>
-                            Crear ejercicio personalizado
-                        </button>
-                        <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
-                            <i class="fas fa-envelope mr-2"></i>
-                            Enviar recordatorio grupal
-                        </button>
-                        <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
-                            <i class="fas fa-chart-bar mr-2"></i>
-                            Programar evaluación
-                        </button>
+
+                    <!-- Próximas Evaluaciones -->
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-calendar-check text-green-600 dark:text-green-400 text-xl"></i>
+                            <h3 class="font-semibold text-green-800 dark:text-green-300">Próximas Evaluaciones</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm text-green-700 dark:text-green-400">
+                            <li class="flex justify-between items-center">
+                                <span>Evaluación Nivel B1</span>
+                                <span class="font-medium">15 Nov</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <span>Práctica Oral Grupal</span>
+                                <span class="font-medium">22 Nov</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <span>Examen Final</span>
+                                <span class="font-medium">10 Dic</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-bolt text-purple-600 dark:text-purple-400 text-xl"></i>
+                            <h3 class="font-semibold text-purple-800 dark:text-purple-300">Acciones Rápidas</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
+                                <i class="fas fa-plus-circle mr-2"></i>
+                                Crear ejercicio personalizado
+                            </button>
+                            <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Enviar recordatorio grupal
+                            </button>
+                            <button class="w-full text-left px-3 py-2 bg-white dark:bg-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors text-sm">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                Programar evaluación
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div> <!-- Fin del contenedor de estadísticas -->
         </div>
     </main>
 

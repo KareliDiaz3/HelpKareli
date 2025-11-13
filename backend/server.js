@@ -1,5 +1,5 @@
 // ==========================================================
-// server.js - SpeakLexi Backend - COMPLETO CON MÓDULO 3
+// server.js - SpeakLexi Backend - COMPLETO CON MÓDULO 4
 // ==========================================================
 
 require('dotenv').config();
@@ -33,6 +33,12 @@ const gamificacionRoutes = require('./routes/gamificacionRoutes');
 const estadisticasRoutes = require('./routes/estadisticasRoutes');
 const retroalimentacionRoutes = require('./routes/retroalimentacionRoutes');
 const planificacionRoutes = require('./routes/planificacionRoutes');
+
+// ==========================================================
+// IMPORTAR RUTAS DE MÓDULO 4: GESTIÓN DE DESEMPEÑO
+// ==========================================================
+const profesorRoutes = require('./routes/profesorRoutes');
+const estudianteRoutes = require('./routes/estudianteRoutes');
 
 // ==========================================================
 // RUTAS DE TESTING (SOLO DESARROLLO)
@@ -139,6 +145,14 @@ app.use('/api/planificacion', planificacionRoutes);
 console.log('✅ Módulo 3 (Aprendizaje) registrado');
 
 // ==========================================================
+// RUTAS DE MÓDULO 4: GESTIÓN DE DESEMPEÑO
+// ==========================================================
+app.use('/api/profesor', profesorRoutes);
+app.use('/api/estudiante', estudianteRoutes);
+
+console.log('✅ Módulo 4 (Desempeño) registrado');
+
+// ==========================================================
 // RUTAS DE TESTING (SOLO EN DESARROLLO)
 // ==========================================================
 
@@ -169,7 +183,10 @@ app.get('/api/health', async (req, res) => {
       gamification: 'available',
       statistics: 'available',
       feedback: 'available',
-      planning: 'available'
+      planning: 'available',
+      // AGREGAR SERVICIOS DEL MÓDULO 4
+      professor: 'available',
+      student: 'available'
   };
 
   // Agregar servicio de testing solo en desarrollo
@@ -200,7 +217,10 @@ app.get('/api/config', (req, res) => {
       gamification: true,
       statistics: true,
       feedback: true,
-      planning: true
+      planning: true,
+      // AGREGAR FEATURES DEL MÓDULO 4
+      professor: true,
+      student: true
   };
 
   const endpoints = {
@@ -215,6 +235,9 @@ app.get('/api/config', (req, res) => {
       estadisticas: '/api/estadisticas',
       retroalimentacion: '/api/retroalimentacion',
       planificacion: '/api/planificacion',
+      // AGREGAR ENDPOINTS DEL MÓDULO 4
+      profesor: '/api/profesor',
+      estudiante: '/api/estudiante',
       health: '/api/health',
       config: '/api/config'
   };
@@ -275,7 +298,16 @@ app.get('/', (req, res) => {
     'POST /api/progreso/registrar - Registrar progreso',
     'GET  /api/progreso/historial - Historial de progreso',
     'GET  /api/gamificacion/puntos - Puntos y logros',
-    'GET  /api/estadisticas/rendimiento - Estadísticas de rendimiento'
+    'GET  /api/estadisticas/rendimiento - Estadísticas de rendimiento',
+
+    '--- GESTIÓN DE DESEMPEÑO (MÓDULO 4) ---',
+    'GET  /api/profesor/dashboard - Dashboard del profesor',
+    'GET  /api/profesor/estudiantes - Lista de estudiantes asignados',
+    'POST /api/profesor/retroalimentacion - Enviar retroalimentación',
+    'GET  /api/profesor/estadisticas - Estadísticas de estudiantes',
+    'POST /api/profesor/planes - Crear plan de estudio',
+    'GET  /api/estudiante/retroalimentacion - Retroalimentación recibida',
+    'POST /api/estudiante/retroalimentacion/:id/marcar-leido - Marcar como leído'
   ];
 
   // Agregar endpoints de testing solo en desarrollo
@@ -318,7 +350,10 @@ app.use('*', (req, res) => {
     '/api/gamificacion/*',
     '/api/estadisticas/*',
     '/api/retroalimentacion/*',
-    '/api/planificacion/*'
+    '/api/planificacion/*',
+    // AGREGAR ENDPOINTS DEL MÓDULO 4
+    '/api/profesor/*',
+    '/api/estudiante/*'
   ];
 
   // Agregar testing solo en desarrollo
@@ -396,6 +431,10 @@ initializeApp().then(() => {
     console.log(`📊 Estadísticas: http://${HOST}:${PORT}/api/estadisticas`);
     console.log(`💬 Retroalimentación: http://${HOST}:${PORT}/api/retroalimentacion`);
     console.log(`📅 Planificación: http://${HOST}:${PORT}/api/planificacion`);
+    
+    // MOSTRAR MÓDULO 4
+    console.log(`👨‍🏫 Profesor: http://${HOST}:${PORT}/api/profesor`);
+    console.log(`👨‍🎓 Estudiante: http://${HOST}:${PORT}/api/estudiante`);
     
     // Mostrar testing solo en desarrollo
     if (process.env.NODE_ENV === 'development') {

@@ -1,6 +1,6 @@
-# RAW LINKS — Actualizado 2025-11-12 13:37:31
+# RAW LINKS — Actualizado 2025-11-12 15:22:35
 # Repositorio: sTr4yDev/speakLexi2.0
-# Commit: ff4528c2303d58e689a094081a311d7c938d6a9b
+# Commit: 24b50b73e1a8cc2f8bc3291d8bd3ab73345069d4
 
 ========================= BACKEND LINKS =========================
 https://raw.githubusercontent.com/sTr4yDev/speakLexi2.0/main/backend/config/database.js

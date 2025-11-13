@@ -47,14 +47,18 @@
     <!-- ✅ CONTENIDO PRINCIPAL -->
     <main class="min-h-screen pt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Header Principal -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel del Profesor</h1>
-                <p class="text-gray-600 dark:text-gray-300">Gestión integral del progreso estudiantil</p>
+            
+            <!-- ============================================
+                 HEADER DEL PROFESOR - MÓDULO 4
+            ============================================ -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-gray-700">
+                <h1 id="nombreProfesor" class="text-2xl font-bold text-gray-900 dark:text-white">Cargando...</h1>
+                <p id="cursoAsignado" class="text-gray-600 dark:text-gray-400 mt-1">Cargando información del curso...</p>
+                <p id="nivelIdioma" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Cargando nivel e idioma...</p>
             </div>
 
             <!-- Loading State -->
-            <div id="loading-dashboard" class="flex justify-center items-center py-20">
+            <div id="loadingDashboard" class="flex justify-center items-center py-20">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
                     <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando dashboard...</p>
@@ -62,70 +66,125 @@
             </div>
 
             <!-- Contenido Principal -->
-            <div id="contenido-dashboard" class="hidden">
+            <div id="dashboardContent" class="hidden">
+                <!-- ============================================
+                     CARDS DE ESTADÍSTICAS PRINCIPALES
+                ============================================ -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Estudiantes</p>
+                                <p id="totalEstudiantes" class="text-3xl font-bold text-indigo-600 dark:text-indigo-500 mt-1">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-users text-indigo-600 dark:text-indigo-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Promedio de la Clase</p>
+                                <p id="promedioClase" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">0%</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Completadas</p>
+                                <p id="leccionesCompletadas" class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Tiempo Total</p>
+                                <p id="tiempoTotalHoras" class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">0h</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================
+                     SECCIÓN DE TOP ESTUDIANTES
+                ============================================ -->
+                <section class="mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Top 5 Estudiantes</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Estudiantes con mejor rendimiento</p>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div id="topEstudiantes" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================
+                     SECCIÓN DE ALERTAS
+                ============================================ -->
+                <section class="mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Alertas Pendientes</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Estudiantes que requieren atención inmediata</p>
+                        </div>
+                        <span id="alertasBadge" class="hidden bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                            0
+                        </span>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                        <div id="alertasContainer" class="space-y-4">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================
+                     BOTONES DE NAVEGACIÓN PRINCIPALES
+                ============================================ -->
+                <section class="mb-8">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="btnVerEstadisticas" class="flex-1 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Ver Todas las Estadísticas
+                        </button>
+                        <button id="btnRetroalimentacion" class="flex-1 px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fas fa-comment-dots mr-3"></i>
+                            Gestionar Retroalimentación
+                        </button>
+                        <button id="btnPlanificacion" class="flex-1 px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fas fa-calendar-plus mr-3"></i>
+                            Crear Plan de Estudio
+                        </button>
+                    </div>
+                </section>
+
                 <!-- ============================================
                      UC-13: CONSULTAR ESTADÍSTICAS DE PROGRESO
                 ============================================ -->
                 <section class="mb-12">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Estadísticas de Progreso</h2>
-                            <p class="text-gray-600 dark:text-gray-400">Seguimiento del avance estudiantil</p>
-                        </div>
-                        <a href="/pages/profesor/estadisticas-profesor.html" 
-                           class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors text-sm font-medium">
-                            Ver estadísticas completas
-                        </a>
-                    </div>
-
-                    <!-- Tarjetas de Resumen -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Estudiantes</p>
-                                    <p id="total-estudiantes" class="text-3xl font-bold text-blue-600 dark:text-blue-500 mt-1">0</p>
-                                </div>
-                                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Lecciones Completadas</p>
-                                    <p id="lecciones-completadas" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-1">0</p>
-                                </div>
-                                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-book text-green-600 dark:text-green-400 text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Promedio XP</p>
-                                    <p id="promedio-xp" class="text-3xl font-bold text-purple-600 dark:text-purple-500 mt-1">0 XP</p>
-                                </div>
-                                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-star text-purple-600 dark:text-purple-400 text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Horas de Estudio</p>
-                                    <p id="horas-totales" class="text-3xl font-bold text-orange-600 dark:text-orange-500 mt-1">0h</p>
-                                </div>
-                                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-clock text-orange-600 dark:text-orange-400 text-xl"></i>
-                                </div>
-                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Estadísticas Detalladas</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Análisis completo del progreso estudiantil</p>
                         </div>
                     </div>
 
@@ -159,99 +218,38 @@
                 <section class="mb-12">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Retroalimentación Pendiente</h2>
-                            <p class="text-gray-600 dark:text-gray-400">Estudiantes que requieren atención</p>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Retroalimentación</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Estadísticas de comunicación con estudiantes</p>
                         </div>
-                        <a href="/pages/profesor/retroalimentacion-profesor.html" 
-                           class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors text-sm font-medium">
-                            Gestionar retroalimentación
-                        </a>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Alertas de Estudiantes</h3>
-                            <span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full text-sm font-medium" id="contador-alertas">0 alertas</span>
-                        </div>
-                        <div id="lista-alertas" class="space-y-4">
-                            <!-- Se llenará dinámicamente -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ============================================
-                     UC-15: PLANIFICAR NUEVOS CONTENIDOS
-                ============================================ -->
-                <section class="mb-12">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Planificación de Contenidos</h2>
-                            <p class="text-gray-600 dark:text-gray-400">Crear y organizar materiales educativos</p>
-                        </div>
-                        <a href="/pages/profesor/gestion-contenido.html" 
-                           class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors text-sm font-medium">
-                            Gestionar contenido
-                        </a>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Lecciones Populares -->
+                        <!-- Estadísticas de Retroalimentación -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Lecciones Más Populares</h3>
-                            <div id="lista-lecciones-populares">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Estadísticas de Retroalimentación</h3>
+                            <div id="statsRetroalimentacion">
                                 <!-- Se llenará dinámicamente -->
                             </div>
                         </div>
 
-                        <!-- Acciones de Planificación -->
+                        <!-- Estadísticas de Planificación -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h3>
-                            <div class="space-y-4">
-                                <a href="/pages/profesor/crear-leccion.html" 
-                                   class="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors group">
-                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-plus text-blue-600 dark:text-blue-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">Crear Nueva Lección</p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">Diseñar contenido educativo</p>
-                                    </div>
-                                </a>
-
-                                <a href="/pages/profesor/planificacion.html" 
-                                   class="flex items-center p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-800 transition-colors group">
-                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-calendar-alt text-green-600 dark:text-green-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">Planificar Curso</p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">Organizar calendario académico</p>
-                                    </div>
-                                </a>
-
-                                <a href="/pages/profesor/recursos.html" 
-                                   class="flex items-center p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg border border-purple-200 dark:border-purple-800 transition-colors group">
-                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-folder-open text-purple-600 dark:text-purple-400"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">Gestionar Recursos</p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">Materiales y documentos</p>
-                                    </div>
-                                </a>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Estadísticas de Planificación</h3>
+                            <div id="statsPlanificacion">
+                                <!-- Se llenará dinámicamente -->
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- ============================================
-                     GESTIÓN DE ESTUDIANTES (Complementario)
+                     GESTIÓN DE ESTUDIANTES
                 ============================================ -->
-                <section>
+                <section class="mb-12">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Estudiantes</h2>
-                            <p class="text-gray-600 dark:text-gray-400">Lista completa de estudiantes</p>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Lista Completa de Estudiantes</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Gestión detallada de todos los estudiantes</p>
                         </div>
                         <div class="flex gap-3">
                             <select id="filtro-nivel" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
