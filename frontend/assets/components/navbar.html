@@ -21,14 +21,32 @@
             <!-- Botones de navegación -->
             <div class="flex items-center space-x-4">
                 <!-- Toggle tema -->
-                <button 
-                    id="theme-toggle" 
+                <button
+                    id="theme-toggle"
                     class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                     aria-label="Cambiar tema"
                 >
                     <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
                 </button>
-                
+
+                <!-- Accesos rápidos para estudiantes -->
+                <a
+                    id="student-profile-link"
+                    href="/pages/estudiante/perfil.html"
+                    class="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-800/40 transition-all"
+                    aria-label="Ver perfil de estudiante"
+                >
+                    <i class="fas fa-user"></i>
+                </a>
+                <a
+                    id="student-change-course-link"
+                    href="/pages/estudiante/cambiar-curso.html"
+                    class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary-200 dark:border-primary-700 text-primary-600 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors font-medium"
+                >
+                    <i class="fas fa-language"></i>
+                    <span>Cambiar curso</span>
+                </a>
+
                 <!-- Menú desktop -->
                 <div class="hidden md:flex space-x-4">
                     <a href="/index.html" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
@@ -66,6 +84,14 @@
             <a href="registro.html" class="block px-4 py-2 bg-gradient-to-r from-secondary-600 to-primary-600 text-white rounded-lg font-medium text-center">
                 Registrarse
             </a>
+            <div id="student-mobile-links" class="hidden border-t border-gray-200 dark:border-gray-700 pt-3 mt-3 space-y-2">
+                <a href="/pages/estudiante/perfil.html" class="block px-4 py-2 text-primary-600 dark:text-primary-300 bg-primary-50/70 dark:bg-primary-900/30 rounded-lg font-medium">
+                    <i class="fas fa-user mr-2"></i>Mi perfil
+                </a>
+                <a href="/pages/estudiante/cambiar-curso.html" class="block px-4 py-2 text-primary-600 dark:text-primary-300 bg-primary-50/70 dark:bg-primary-900/30 rounded-lg font-medium">
+                    <i class="fas fa-language mr-2"></i>Cambiar curso
+                </a>
+            </div>
         </div>
     </div>
 </nav>

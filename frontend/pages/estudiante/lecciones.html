@@ -1,0 +1,135 @@
+<!--
+/pages/estudiante/lecciones.html
+Lecciones interactivas por idioma y nivel para estudiantes.
+-->
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecciones Interactivas - SpeakLexi</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Estilos compartidos -->
+    <link rel="stylesheet" href="/assets/css/custom-styles.css">
+    <link rel="stylesheet" href="/assets/css/animations.css">
+
+    <!-- Configuración Tailwind -->
+    <script src="/assets/js/core/tailwind-config.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300 min-h-screen">
+    <!-- Navbar dinánimo -->
+    <div id="navbar-container"></div>
+
+    <main class="pt-24 pb-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Encabezado -->
+            <header class="mb-10 animate-fade-in">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Lecciones Interactivas</h1>
+                        <p class="text-gray-600 dark:text-gray-300 mt-2">Selecciona un idioma y un nivel para comenzar tu práctica personalizada de 10 preguntas.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        <a href="/pages/estudiante/estudiante-dashboard.html" class="hover:text-primary-600 dark:hover:text-primary-400">Dashboard</a>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                        <span class="text-primary-600 dark:text-primary-400 font-semibold">Lecciones</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contenido principal -->
+            <div class="grid lg:grid-cols-3 gap-6">
+                <section class="lg:col-span-2 space-y-6">
+                    <!-- Selector de lección -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Configura tu lección</h2>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="idioma-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Idioma
+                                </label>
+                                <select id="idioma-select" class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                </select>
+                            </div>
+                            <div>
+                                <label for="nivel-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Nivel CEFR
+                                </label>
+                                <select id="nivel-select" class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-secondary-500 focus:border-transparent">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <button id="start-lesson-btn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-secondary-600 to-primary-600 text-white font-semibold hover:from-secondary-700 hover:to-primary-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                                <i class="fas fa-play mr-2"></i>Comenzar lección
+                            </button>
+                            <button id="reset-selection-btn" class="px-6 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-rotate-left mr-2"></i>Restablecer selección
+                            </button>
+                        </div>
+                        <div id="lesson-description" class="mt-6 text-sm text-gray-600 dark:text-gray-300"></div>
+                    </div>
+
+                    <!-- Tarjeta de preguntas -->
+                    <div id="lesson-container" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Idioma seleccionado</p>
+                                <p class="text-lg font-semibold text-gray-900 dark:text-white" id="selected-lesson-title"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Progreso</p>
+                                <p class="text-lg font-semibold text-primary-600 dark:text-primary-400"><span id="question-index">1</span>/10</p>
+                            </div>
+                        </div>
+                        <div class="px-6 py-6" id="question-wrapper">
+                            <!-- El contenido de la pregunta se inyecta vía JS -->
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div id="results-container" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6"></div>
+                </section>
+
+                <!-- Panel lateral -->
+                <aside class="space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Historial reciente</h3>
+                        <div id="history-container" class="space-y-3 text-sm text-gray-600 dark:text-gray-300"></div>
+                        <p id="history-empty" class="text-sm text-gray-500 dark:text-gray-400">Las lecciones que termines aparecerán aquí con tus resultados.</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-xl p-6 text-white">
+                        <h3 class="text-lg font-semibold mb-2">¿Listo para competir?</h3>
+                        <p class="text-sm text-purple-100 mb-4">Revisa la tabla de clasificación y desafía a tus compañeros con tus nuevas puntuaciones.</p>
+                        <a href="/pages/estudiante/leaderboard.html" class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white/15 hover:bg-white/25 rounded-xl font-semibold transition-colors">
+                            <i class="fas fa-trophy"></i> Ver clasificación
+                        </a>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toasts -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
+
+    <!-- Scripts -->
+    <script src="/config/app-config.js"></script>
+    <script src="/assets/js/core/api-client.js" async></script>
+    <script src="/assets/js/core/form-validator.js" async></script>
+    <script src="/assets/js/core/toast-manager.js"></script>
+    <script src="/assets/js/core/module-loader.js"></script>
+    <script src="/assets/js/core/theme-manager.js" async></script>
+    <script src="/assets/js/core/navbar-loader.js"></script>
+    <script src="/assets/js/core/utils.js"></script>
+    <script src="/assets/js/data/lecciones-data.js"></script>
+    <script src="/assets/js/pages/estudiante/lecciones.js"></script>
+</body>
+</html>
