@@ -10,6 +10,10 @@
     const dependencias = ['APP_CONFIG', 'toastManager', 'ModuleLoader', 'Utils'];
     const progressStore = window.StudentProgress || null;
 
+    if (!progressStore) {
+        console.warn('[SpeakLexi] StudentProgress store no encontrado. La sesión actual no persistirá progreso.');
+    }
+
     const inicializado = await window.ModuleLoader.initModule({
         moduleName: 'Lecciones Interactivas',
         dependencies: dependencias,
