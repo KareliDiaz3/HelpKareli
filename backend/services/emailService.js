@@ -49,9 +49,8 @@ async function sendWithRetry(mailOptions, retries = 3) {
   }
 }
 
-// 4. Función para enviar código de verificación
-exports.enviarCodigoVerificacion = async (correo, codigo) => {
-  const mailOptions = {
+function buildVerificationEmail(correo, codigo) {
+  return {
     from: EMAIL_FROM,
     to: correo,
     subject: 'Verifica tu cuenta - SpeakLexi',
@@ -68,15 +67,12 @@ exports.enviarCodigoVerificacion = async (correo, codigo) => {
       </div>
     `
   };
+}
 
-  return await sendWithRetry(mailOptions);
-};
-
-// 5. Función para enviar recuperación de contraseña
-exports.enviarRecuperacionContrasena = async (correo, token, nombre = 'Estudiante') => {
+function buildRecoveryEmail(correo, token, nombre = 'Estudiante') {
   const enlace = `${FRONTEND_URL}/pages/auth/restablecer-contrasena.html?token=${token}&email=${encodeURIComponent(correo)}`;
 
-  const mailOptions = {
+  return {
     from: EMAIL_FROM,
     to: correo,
     subject: 'Recuperación de contraseña - SpeakLexi',
@@ -108,8 +104,19 @@ exports.enviarRecuperacionContrasena = async (correo, token, nombre = 'Estudiant
       </div>
     `
   };
+}
 
-  return await sendWithRetry(mailOptions);
+exports.buildVerificationEmail = buildVerificationEmail;
+exports.buildRecoveryEmail = buildRecoveryEmail;
+
+// 4. Función para enviar código de verificación
+exports.enviarCodigoVerificacion = async (correo, codigo) => {
+  return await sendWithRetry(buildVerificationEmail(correo, codigo));
+};
+
+// 5. Función para enviar recuperación de contraseña
+exports.enviarRecuperacionContrasena = async (correo, token, nombre = 'Estudiante') => {
+  return await sendWithRetry(buildRecoveryEmail(correo, token, nombre));
 };
 
 exports.enviarRecuperacionPassword = exports.enviarRecuperacionContrasena;
