@@ -2,6 +2,9 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const EMAIL_FROM = process.env.EMAIL_FROM || `SpeakLexi <${process.env.EMAIL_USER}>`;
+
 // 1. Configuración SIMPLE del Transporter (usando EMAIL_* de tu .env)
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || 'gmail',
@@ -46,10 +49,9 @@ async function sendWithRetry(mailOptions, retries = 3) {
   }
 }
 
-// 4. Función para enviar código de verificación
-exports.enviarCodigoVerificacion = async (correo, codigo) => {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
+function buildVerificationEmail(correo, codigo) {
+  return {
+    from: EMAIL_FROM,
     to: correo,
     subject: 'Verifica tu cuenta - SpeakLexi',
     html: `
@@ -65,49 +67,59 @@ exports.enviarCodigoVerificacion = async (correo, codigo) => {
       </div>
     `
   };
+}
 
-  return await sendWithRetry(mailOptions);
-};
+function buildRecoveryEmail(correo, token, nombre = 'Estudiante') {
+  const enlace = `${FRONTEND_URL}/pages/auth/restablecer-contrasena.html?token=${token}&email=${encodeURIComponent(correo)}`;
 
-// 5. Función para enviar recuperación de contraseña
-exports.enviarRecuperacionPassword = async (correo, token) => {
-  const enlace = `${process.env.FRONTEND_URL}/pages/auth/restablecer-contrasena.html?token=${token}`;
-
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
+  return {
+    from: EMAIL_FROM,
     to: correo,
     subject: 'Recuperación de contraseña - SpeakLexi',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #667eea;">Recuperación de Contraseña</h1>
-        <p>Haz clic en el siguiente botón para restablecer tu contraseña:</p>
+        <h1 style="color: #667eea;">Hola ${nombre} 👋</h1>
+        <p>Recibimos una solicitud para restablecer tu contraseña. Usa el siguiente botón para continuar:</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${enlace}" 
-             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    color: white; 
-                    padding: 15px 40px; 
-                    text-decoration: none; 
-                    border-radius: 8px; 
+          <a href="${enlace}"
+             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 40px;
+                    text-decoration: none;
+                    border-radius: 8px;
                     font-weight: bold;
                     display: inline-block;">
             Restablecer Contraseña
           </a>
         </div>
         <p style="color: #666; text-align: center;">
-          O copia este enlace:<br>
+          También puedes copiar este enlace en tu navegador:<br>
           <span style="background: #f5f5f5; padding: 5px 10px; border-radius: 4px; font-size: 12px;">
             ${enlace}
           </span>
         </p>
         <p style="color: #999; font-size: 12px; margin-top: 30px;">
-          Este enlace expira en 1 hora. Si no solicitaste este cambio, ignora este mensaje.
+          El enlace expira en 1 hora. Si no solicitaste este cambio, ignora este mensaje.
         </p>
       </div>
     `
   };
+}
 
-  return await sendWithRetry(mailOptions);
+exports.buildVerificationEmail = buildVerificationEmail;
+exports.buildRecoveryEmail = buildRecoveryEmail;
+
+// 4. Función para enviar código de verificación
+exports.enviarCodigoVerificacion = async (correo, codigo) => {
+  return await sendWithRetry(buildVerificationEmail(correo, codigo));
 };
+
+// 5. Función para enviar recuperación de contraseña
+exports.enviarRecuperacionContrasena = async (correo, token, nombre = 'Estudiante') => {
+  return await sendWithRetry(buildRecoveryEmail(correo, token, nombre));
+};
+
+exports.enviarRecuperacionPassword = exports.enviarRecuperacionContrasena;
 
 // 6. Función simple para probar el servicio
 exports.probarEmail = async () => {

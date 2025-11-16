@@ -113,17 +113,29 @@
                 { question: "Quelle est la forme passive: 'Ils ont construit la maison en 1990'", options: ["La maison a été construite en 1990", "La maison est construite en 1990", "La maison a construit en 1990", "La maison était construite en 1990"], correct: 0 },
                 { question: "Que signifie 'sérendipité'?", options: ["Une heureuse découverte", "Un moment triste", "Une situation difficile", "Un événement planifié"], correct: 0 }
             ],
-            'portugués': [
-                { question: "Como se diz 'Olá' em português?", options: ["Olá", "Adeus", "Obrigado", "Por favor"], correct: 0 },
-                { question: "Qual é a forma correta: 'Eu ___ português'", options: ["sou", "és", "é", "são"], correct: 0 },
-                { question: "Complete: 'Nós ___ para o Brasil no ano passado'", options: ["vamos", "fomos", "iremos", "íamos"], correct: 1 },
-                { question: "Qual frase está correta?", options: ["Eu vou ao cinema", "Eu vai ao cinema", "Eu ir ao cinema", "Eu vou cinema"], correct: 0 },
-                { question: "O que significa 'embora'?", options: ["porque", "mas", "portanto", "também"], correct: 1 },
-                { question: "Escolha a forma correta: 'Se eu ___ rico, viajaria pelo mundo'", options: ["fosse", "era", "seja", "sou"], correct: 0 },
-                { question: "Qual é um sinônimo de 'onipresente'?", options: ["raro", "em todo lugar", "bonito", "difícil"], correct: 1 },
-                { question: "Complete a expressão: 'Está chovendo a cântaros e ___'", options: ["cachorros", "gatos", "peixes", "ratos"], correct: 1 },
-                { question: "Qual é a forma passiva: 'Eles construíram a casa em 1990'", options: ["A casa foi construída em 1990", "A casa é construída em 1990", "A casa construiu em 1990", "A casa estava construída em 1990"], correct: 0 },
-                { question: "O que significa 'serendipidade'?", options: ["Um feliz acidente", "Um momento triste", "Uma situación difícil", "Um evento planejado"], correct: 0 }
+            'alemán': [
+                { question: "¿Cómo se dice 'Buenos días' en alemán?", options: ["Guten Morgen", "Gute Nacht", "Guten Abend", "Auf Wiedersehen"], correct: 0 },
+                { question: "Completa: 'Ich ___ seit zwei Jahren Deutsch.'", options: ["lerne", "lernen", "gelernt", "lernt"], correct: 0 },
+                { question: "Selecciona la opción correcta: 'Wenn ich Zeit habe, ___ ich spazieren.'", options: ["gehe", "ging", "gegangen", "gehen"], correct: 0 },
+                { question: "¿Cuál es un sinónimo de 'verbessern'?", options: ["verschlechtern", "optimieren", "vergessen", "ignorieren"], correct: 1 },
+                { question: "Completa la pregunta: 'Hast du den Bericht ___?'", options: ["lesen", "gelesen", "liest", "gelesene"], correct: 1 },
+                { question: "Identifica la voz pasiva correcta.", options: ["Das Haus wurde 1990 gebaut.", "1990 baut das Haus.", "Das Haus ist bauen 1990.", "Das Haus hat gebaut."], correct: 0 },
+                { question: "Completa: 'Wir freuen uns ___ Ihren Besuch.'", options: ["auf", "für", "zu", "an"], correct: 0 },
+                { question: "¿Qué significa 'obwohl'?", options: ["porque", "aunque", "después", "durante"], correct: 1 },
+                { question: "Selecciona la frase con Konjunktiv II correcta.", options: ["Wenn ich Geld habe, reise ich.", "Wenn ich mehr Zeit hätte, würde ich reisen.", "Wenn ich mehr Zeit habe, würde ich reisen.", "Wenn ich mehr Zeit hätte, werde ich reisen."], correct: 1 },
+                { question: "Completa: 'Kaum war er angekommen, ___ es zu regnen.'", options: ["begann", "beginnt", "hat begonnen", "wird beginnen"], correct: 0 }
+            ],
+            'italiano': [
+                { question: "¿Cómo se dice 'Buenas tardes' en italiano?", options: ["Buon pomeriggio", "Buona sera", "Buona notte", "Buongiorno"], correct: 0 },
+                { question: "Completa: 'Sto ___ italiano da tre mesi.'", options: ["studiando", "studiare", "studio", "studiato"], correct: 0 },
+                { question: "Selecciona la opción correcta: 'Se avessi tiempo, ___ al mare.'", options: ["andrò", "andrei", "andavo", "andato"], correct: 1 },
+                { question: "¿Cuál es un sinónimo de 'migliorare'?", options: ["peggiorare", "perfezionare", "dimenticare", "ignorare"], correct: 1 },
+                { question: "Completa la pregunta: 'Hai ___ il documento?'", options: ["leggere", "letto", "leggendo", "leggi"], correct: 1 },
+                { question: "Identifica la voz pasiva correcta.", options: ["Il consiglio approva il progetto.", "Il progetto è stato approvato dal consiglio.", "Il progetto approva il consiglio.", "Il progetto approvò il consiglio."], correct: 1 },
+                { question: "Completa: 'Nonostante ___ stanco, ha continuato a lavorare.'", options: ["sia", "fu", "fosse", "è"], correct: 2 },
+                { question: "¿Qué significa 'benché'?", options: ["porque", "aunque", "siempre que", "después"], correct: 1 },
+                { question: "Selecciona la frase condicional formal correcta.", options: ["Qualora avesse bisogno, ci contatti.", "Qualora ha bisogno, ci contatta.", "Qualora avrà bisogno, contattaci.", "Qualora aveva bisogno, contattava."], correct: 0 },
+                { question: "Completa: 'Appena ebbi chiuso la porta, ___ il telefono.'", options: ["suonava", "suonò", "suonerà", "suonato"], correct: 1 }
             ]
         };
 
@@ -232,7 +244,7 @@
          * Inicia el proceso de evaluación
          */
         function iniciarEvaluacion() {
-            const supportedLanguages = ['inglés', 'francés', 'portugués'];
+            const supportedLanguages = ['inglés', 'francés', 'alemán', 'italiano'];
             if (!supportedLanguages.includes(estado.idioma.toLowerCase())) {
                 window.toastManager.info(`Examen para otros idiomas en desarrollo. Selecciona tu nivel manualmente.`);
                 return;

@@ -495,13 +495,15 @@ class APIClient {
     }
 }
 
-// Crear instancia global automáticamente
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.apiClient = new APIClient();
-    });
-} else {
-    window.apiClient = new APIClient();
+// Crear instancia global inmediatamente (sin depender de DOMContentLoaded)
+if (typeof window !== 'undefined') {
+    try {
+        if (!window.apiClient) {
+            window.apiClient = new APIClient();
+        }
+    } catch (error) {
+        console.error('💥 No fue posible inicializar APIClient automáticamente:', error);
+    }
 }
 
 // Exportar para uso en módulos

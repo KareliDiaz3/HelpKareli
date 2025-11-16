@@ -12,12 +12,14 @@
     // ============================================
     const dependencias = [
         'APP_CONFIG',
-        'apiClient', 
+        'apiClient',
         'formValidator',
         'toastManager',
         'Utils',
         'ModuleLoader'
     ];
+
+    const progressStore = window.StudentProgress || null;
 
     const inicializado = await window.ModuleLoader.initModule({
         moduleName: 'Cambiar Curso',
@@ -151,11 +153,12 @@
          * Obtiene datos de fallback desde localStorage
          */
         function obtenerDatosFallback() {
+            const snapshot = progressStore?.getSnapshot();
             return {
                 usuario: estado.usuario,
                 datos_estudiante: {
-                    idioma_aprendizaje: estado.usuario?.idioma || 'Inglés',
-                    nivel_actual: estado.usuario?.nivel_actual || 'A1'
+                    idioma_aprendizaje: snapshot?.idiomaActual || estado.usuario?.idioma || 'Inglés',
+                    nivel_actual: snapshot?.nivelActual || estado.usuario?.nivel_actual || 'A1'
                 }
             };
         }
@@ -234,8 +237,7 @@
 
             try {
                 console.log('📤 Actualizando curso...');
-                
-                // ✅ USAR apiClient PARA ACTUALIZAR CURSO
+
                 const response = await window.apiClient.patch(config.ENDPOINTS.AUTH.ACTUALIZAR_NIVEL, {
                     correo: estado.usuario.correo,
                     nivel: nivel,
@@ -244,35 +246,35 @@
 
                 if (response.success) {
                     window.toastManager.success('¡Curso actualizado exitosamente!');
-
-                    // Actualizar datos locales
-                    if (estado.datosPerfil.datos_estudiante) {
-                        estado.datosPerfil.datos_estudiante.idioma_aprendizaje = idioma;
-                        estado.datosPerfil.datos_estudiante.nivel_actual = nivel;
-                    }
-
-                    // Actualizar localStorage
-                    if (estado.usuario.datos_estudiante) {
-                        estado.usuario.datos_estudiante.idioma_aprendizaje = idioma;
-                        estado.usuario.datos_estudiante.nivel_actual = nivel;
-                        window.Utils.saveToStorage(config.STORAGE.USUARIO, estado.usuario);
-                    }
-
-                    // Redirigir después de éxito
-                    setTimeout(() => {
-                        window.location.href = config.UI.RUTAS.PERFIL;
-                    }, 1500);
-
                 } else {
                     throw new Error(response.error || 'Error al actualizar el curso');
                 }
 
             } catch (error) {
                 console.error('💥 Error al actualizar curso:', error);
-                window.toastManager.error(error.message);
+                window.toastManager.warning('No pudimos sincronizar con el servidor, pero guardamos el cambio localmente.');
             } finally {
+                aplicarCambioLocal(idioma, nivel);
                 mostrarCargando(false);
+                setTimeout(() => {
+                    window.location.href = '/pages/estudiante/estudiante-dashboard.html';
+                }, 1200);
             }
+        }
+
+        function aplicarCambioLocal(idioma, nivel) {
+            if (estado.datosPerfil?.datos_estudiante) {
+                estado.datosPerfil.datos_estudiante.idioma_aprendizaje = idioma;
+                estado.datosPerfil.datos_estudiante.nivel_actual = nivel;
+            }
+
+            if (!estado.usuario.datos_estudiante) {
+                estado.usuario.datos_estudiante = {};
+            }
+            estado.usuario.datos_estudiante.idioma_aprendizaje = idioma;
+            estado.usuario.datos_estudiante.nivel_actual = nivel;
+            window.Utils.saveToStorage(config.STORAGE.USUARIO, estado.usuario);
+            progressStore?.changeCourse(idioma, nivel);
         }
 
         /**
