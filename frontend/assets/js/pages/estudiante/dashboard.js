@@ -6,6 +6,29 @@
 (async () => {
     'use strict';
 
+    const elementosIniciales = {
+        loading: document.getElementById('loading-dashboard'),
+        contenido: document.getElementById('contenido-dashboard')
+    };
+
+    function mostrarErrorInicial(mensaje) {
+        if (elementosIniciales.loading) {
+            elementosIniciales.loading.innerHTML = `
+                <div class="text-center space-y-4">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 font-semibold">${mensaje}</p>
+                    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg" onclick="window.location.reload()">
+                        Reintentar
+                    </button>
+                </div>`;
+        }
+        if (elementosIniciales.contenido) {
+            elementosIniciales.contenido.classList.remove('hidden');
+        }
+    }
+
     // ============================================
     // ELEMENTOS BASE PARA MANEJAR EL ESTADO DE CARGA
     // ============================================
@@ -1100,6 +1123,9 @@
         // INICIALIZACIÓN
         // ===================================
         
+        // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
+        prehidratarDashboardLocal();
+
         // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
         prehidratarDashboardLocal();
 
