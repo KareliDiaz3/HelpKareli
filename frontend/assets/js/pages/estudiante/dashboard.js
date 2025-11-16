@@ -7,21 +7,145 @@
     'use strict';
 
     // ============================================
+    // ELEMENTOS BASE PARA MANEJAR EL ESTADO DE CARGA
+    // ============================================
+    const cargaUI = {
+        contenido: document.getElementById('contenido-dashboard'),
+        loading: document.getElementById('loading-dashboard')
+    };
+
+    function mostrarSeccionPrincipal() {
+        if (cargaUI.loading) {
+            cargaUI.loading.classList.add('hidden');
+        }
+        if (cargaUI.contenido) {
+            cargaUI.contenido.classList.remove('hidden');
+        }
+    }
+
+    function mostrarErrorDependencias(titulo, detalle) {
+        mostrarSeccionPrincipal();
+
+        if (!cargaUI.contenido) return;
+
+        cargaUI.contenido.innerHTML = `
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-800/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-plug-circle-xmark text-red-600 dark:text-red-200 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-red-700 dark:text-red-100 mb-3">${titulo}</h3>
+                <p class="text-red-600 dark:text-red-200 mb-6">${detalle}</p>
+                <button class="px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors" onclick="window.location.reload()">
+                    <i class="fas fa-rotate-right mr-2"></i>Reintentar
+                </button>
+            </div>
+        `;
+    }
+
+    // ============================================
     // ESPERAR DEPENDENCIAS
     // ============================================
-    const dependencias = ['APP_CONFIG', 'apiClient', 'ModuleLoader'];
+    const dependencias = ['APP_CONFIG', 'ModuleLoader'];
+    const moduleLoader = window.ModuleLoader;
+    let apiClientReadyPromise = null;
 
-    const inicializado = await window.ModuleLoader.initModule({
+    if (!moduleLoader || typeof moduleLoader.initModule !== 'function') {
+        mostrarErrorDependencias('No se pudo preparar el dashboard', 'El cargador de módulos no está disponible. Asegúrate de incluir /assets/js/core/module-loader.js en el HTML.');
+        return;
+    }
+
+    const inicializado = await moduleLoader.initModule({
         moduleName: 'Dashboard Estudiante',
         dependencies: dependencias,
         onReady: inicializarDashboard,
         onError: (error) => {
             console.error('💥 Error al cargar dashboard:', error);
-            mostrarErrorDashboard('Error al cargar el dashboard');
+            mostrarErrorDependencias('No se pudo iniciar el dashboard', 'Ocurrió un error inesperado durante la inicialización.');
         }
     });
 
-    if (!inicializado) return;
+    if (!inicializado) {
+        const faltantes = dependencias.filter(dep => !window[dep]);
+        const detalle = faltantes.length
+            ? `No se cargaron las dependencias: ${faltantes.join(', ')}. Verifica que los scripts necesarios estén disponibles.`
+            : 'El cargador de módulos no pudo inicializar esta página. Revisa la consola para más detalles.';
+        mostrarErrorDependencias('No se pudo cargar el dashboard', detalle);
+        return;
+    }
+
+    function esperarApiClient(maxWait = 10000) {
+        return new Promise((resolve, reject) => {
+            const start = Date.now();
+            const interval = setInterval(() => {
+                if (window.apiClient) {
+                    clearInterval(interval);
+                    resolve(window.apiClient);
+                    return;
+                }
+                if (window.APIClient) {
+                    window.apiClient = new window.APIClient();
+                    clearInterval(interval);
+                    resolve(window.apiClient);
+                    return;
+                }
+
+                if (Date.now() - start >= maxWait) {
+                    clearInterval(interval);
+                    reject(new Error('apiClient no estuvo listo dentro del tiempo esperado'));
+                }
+            }, 50);
+        });
+    }
+
+    function cargarScriptAsync(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+            document.head.appendChild(script);
+        });
+    }
+
+    async function asegurarApiClient() {
+        if (window.apiClient) {
+            return window.apiClient;
+        }
+
+        if (window.APIClient) {
+            window.apiClient = new window.APIClient();
+            return window.apiClient;
+        }
+
+        if (!apiClientReadyPromise) {
+            apiClientReadyPromise = esperarApiClient();
+        }
+
+        try {
+            return await apiClientReadyPromise;
+        } catch (error) {
+            console.warn('⌛ apiClient no estuvo listo a tiempo, reintentando con carga directa...', error);
+            apiClientReadyPromise = null;
+
+            try {
+                await cargarScriptAsync('/assets/js/core/api-client.js');
+            } catch (cargaError) {
+                throw new Error(`No se pudo cargar el cliente API: ${cargaError.message}`);
+            }
+
+            if (window.apiClient) {
+                return window.apiClient;
+            }
+
+            if (window.APIClient) {
+                window.apiClient = new window.APIClient();
+                return window.apiClient;
+            }
+
+            throw new Error('apiClient sigue sin inicializar después del reintento');
+        }
+    }
 
     // ============================================
     // FUNCIÓN PRINCIPAL
@@ -29,7 +153,19 @@
     async function inicializarDashboard() {
         console.log('✅ Dashboard Estudiante iniciando...');
 
-        const client = window.apiClient;
+        mostrarSeccionPrincipal();
+
+        let client;
+        try {
+            client = await asegurarApiClient();
+        } catch (error) {
+            console.error('💥 No fue posible asegurar apiClient para el dashboard:', error);
+            mostrarErrorDependencias('No se pudo preparar el dashboard', 'No fue posible inicializar el cliente API en el navegador. Recarga la página o verifica que /assets/js/core/api-client.js esté accesible.');
+            return;
+        }
+        const progressStore = window.StudentProgress || null;
+        let seUsoDashboardLocal = false;
+        let prehidratadoConLocal = false;
 
         // ===================================
         // ELEMENTOS DEL DOM
@@ -45,9 +181,10 @@
             // Contenedor principal
             contenidoDashboard: document.getElementById('contenido-dashboard'),
             loadingDashboard: document.getElementById('loading-dashboard'),
-            
+
             // Greeting
-            greeting: document.getElementById('greeting')
+            greeting: document.getElementById('greeting'),
+            logoutBtn: document.getElementById('logout-dashboard-btn')
         };
 
         // ===================================
@@ -56,61 +193,41 @@
         async function cargarResumen() {
             try {
                 console.log('🔄 Cargando resumen del estudiante...');
-                
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
+
                 const resultado = await client.get('/progreso/resumen');
-                
                 console.log('🔍 DEBUG Resultado completo:', resultado);
 
-                // Verificar si la petición fue exitosa
                 if (!resultado.success) {
-                    console.warn('⚠️ Petición no exitosa:', resultado.error);
-                    
-                    // Si es 404, es usuario nuevo
                     if (resultado.status === 404) {
-                        mostrarEstadoInicial();
+                        if (!mostrarDashboardLocal()) {
+                            mostrarEstadoInicial();
+                        }
                         return;
                     }
-                    
                     throw new Error(resultado.error || `Error HTTP: ${resultado.status}`);
                 }
 
-                // ✅ Los datos están en resultado.data
-                const data = resultado.data;
-                console.log('📊 Datos del dashboard cargados:', data);
-
-                // Verificar estructura de datos
-                if (!data || typeof data !== 'object') {
-                    throw new Error('Respuesta inválida del servidor');
-                }
-
-                // Verificar si hay datos reales
-                const datosReales = data.data || data;
-                
-                if (!datosReales || Object.keys(datosReales).length === 0) {
-                    console.warn('⚠️ No hay datos disponibles, mostrando estado inicial');
-                    mostrarEstadoInicial();
+                const datosReales = resultado.data?.data || resultado.data;
+                if (!datosReales || typeof datosReales !== 'object' || Object.keys(datosReales).length === 0) {
+                    console.warn('⚠️ No hay datos disponibles desde API, usando progreso local');
+                    if (!mostrarDashboardLocal()) {
+                        mostrarEstadoInicial();
+                    }
                     return;
                 }
 
-                // Actualizar stats superiores
                 actualizarStatsSuperiores(datosReales);
-
-                // Renderizar contenido dinámico
                 renderizarContenidoDinamico(datosReales);
-
-                // Cargar lecciones recomendadas
                 await cargarLeccionesRecomendadas();
 
             } catch (error) {
                 console.error('❌ Error al cargar resumen:', error);
-                console.error('🔍 Stack trace:', error.stack);
-                
-                // Si el error es 404 o no hay datos, mostrar estado inicial
-                if (error.message.includes('404') || error.message.includes('No hay datos')) {
-                    mostrarEstadoInicial();
-                } else {
-                    mostrarEstadoSinDatos('No se pudo conectar con el servidor. Intenta más tarde.');
+                if (!mostrarDashboardLocal()) {
+                    if (error.message.includes('404') || error.message.includes('No hay datos')) {
+                        mostrarEstadoInicial();
+                    } else {
+                        mostrarEstadoSinDatos('No se pudo conectar con el servidor. Intenta más tarde.');
+                    }
                 }
             }
         }
@@ -121,24 +238,25 @@
         async function cargarLeccionesRecomendadas() {
             try {
                 console.log('🔄 Cargando lecciones recomendadas...');
-                
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
+
+                if (progressStore) {
+                    const locales = progressStore.getRecommendedLessons(8);
+                    if (locales.length) {
+                        renderizarLeccionesRecomendadas(locales);
+                    }
+                }
+
                 const resultado = await client.get('/progreso/lecciones-recomendadas');
-                
                 console.log('📚 Resultado lecciones recomendadas:', resultado);
 
-                // Si la petición no fue exitosa, salir silenciosamente
                 if (!resultado.success) {
                     console.warn('⚠️ No se pudieron cargar lecciones recomendadas:', resultado.error);
                     return;
                 }
 
-                // ✅ Los datos están en resultado.data
                 const data = resultado.data;
-                
-                // Manejar diferentes estructuras de respuesta
                 const leccionesRecomendadas = data.lecciones_recomendadas || data.data || data || [];
-                
+
                 if (Array.isArray(leccionesRecomendadas) && leccionesRecomendadas.length > 0) {
                     renderizarLeccionesRecomendadas(leccionesRecomendadas);
                 } else {
@@ -147,8 +265,28 @@
 
             } catch (error) {
                 console.error('❌ Error al cargar lecciones recomendadas:', error);
-                // No mostramos error al usuario para lecciones recomendadas
             }
+        }
+
+        function prehidratarDashboardLocal() {
+            if (!progressStore || prehidratadoConLocal) return;
+            const data = progressStore.getDashboardData();
+            if (!data) return;
+            prehidratadoConLocal = true;
+            actualizarStatsSuperiores(data);
+            renderizarContenidoDinamico(data);
+            renderizarLeccionesRecomendadas(data.leccionesRecomendadas || []);
+        }
+
+        function mostrarDashboardLocal() {
+            if (!progressStore) return false;
+            if (seUsoDashboardLocal) return true;
+            const data = progressStore.getDashboardData();
+            if (!data) return false;
+            actualizarStatsSuperiores(data);
+            renderizarContenidoDinamico(data);
+            seUsoDashboardLocal = true;
+            return true;
         }
 
         // ===================================
@@ -156,7 +294,11 @@
         // ===================================
         function mostrarEstadoInicial() {
             console.log('🆕 Mostrando estado inicial para usuario nuevo');
-            
+
+            if (mostrarDashboardLocal()) {
+                return;
+            }
+
             // Resetear stats a valores iniciales
             if (elementos.diasRachaStat) elementos.diasRachaStat.textContent = '0';
             if (elementos.totalXPStat) elementos.totalXPStat.textContent = '0';
@@ -278,38 +420,40 @@
             const usuario = data.usuario || data.perfil || {};
             const progreso = data.progreso || data.estadisticas || {};
             const estadisticas = data.estadisticas || {};
+            const snapshot = progressStore?.getSnapshot();
 
             console.log('📈 Actualizando stats con:', { usuario, progreso, estadisticas });
 
-            // Racha 
+            // Racha
             if (elementos.diasRachaStat) {
-                elementos.diasRachaStat.textContent = estadisticas.rachaActual || usuario.racha_dias || 0;
+                elementos.diasRachaStat.textContent = estadisticas.rachaActual || usuario.racha_dias || snapshot?.rachaDias || 0;
             }
 
             // XP Total
             if (elementos.totalXPStat) {
-                elementos.totalXPStat.textContent = usuario.xp || usuario.total_xp || estadisticas.puntosTotales || 0;
+                elementos.totalXPStat.textContent = usuario.xp || usuario.total_xp || estadisticas.puntosTotales || snapshot?.xp || 0;
             }
 
             // Lecciones Completadas
             if (elementos.leccionesCompletadasStat) {
-                elementos.leccionesCompletadasStat.textContent = 
-                    progreso.leccionesCompletadas || 
-                    estadisticas.lecciones_completadas || 
+                elementos.leccionesCompletadasStat.textContent =
+                    progreso.leccionesCompletadas ||
+                    estadisticas.lecciones_completadas ||
+                    snapshot?.totalLecciones ||
                     0;
             }
 
             // Nivel e Idioma
             if (elementos.nivelUsuarioStat) {
-                elementos.nivelUsuarioStat.textContent = usuario.nivel || usuario.nivel_actual || 'A1';
+                elementos.nivelUsuarioStat.textContent = usuario.nivel || usuario.nivel_actual || snapshot?.nivelActual || 'A1';
             }
             if (elementos.idiomaAprendizajeStat) {
-                elementos.idiomaAprendizajeStat.textContent = usuario.idioma || usuario.idioma_aprendizaje || 'Inglés';
+                elementos.idiomaAprendizajeStat.textContent = usuario.idioma || usuario.idioma_aprendizaje || snapshot?.idiomaActual || 'Inglés';
             }
 
             // Actualizar greeting
             if (elementos.greeting) {
-                const nombre = usuario.nombre || 'Estudiante';
+                const nombre = usuario.nombre || snapshot?.nombreCompleto || snapshot?.nombre || 'Estudiante';
                 const hora = new Date().getHours();
                 let saludo = 'Buenos días';
                 if (hora >= 12 && hora < 19) saludo = 'Buenas tardes';
@@ -328,10 +472,11 @@
             const usuario = data.usuario || data.perfil || {};
             const progreso = data.progreso || data.estadisticas || {};
             const leccionesEnProgreso = data.leccionesEnProgreso || data.lecciones_en_progreso || [];
-            const leccionesCompletadas = data.leccionesCompletadas || data.lecciones_completadas || data.actividadReciente || [];
-            const logros = data.logros || data.logros_recientes || [];
-            const cursos = data.cursos || [];
-            const leccionesRecomendadas = data.leccionesRecomendadas || [];
+            const snapshot = progressStore?.getSnapshot();
+            const leccionesCompletadas = data.leccionesCompletadas || data.lecciones_completadas || data.actividadReciente || snapshot?.historial || [];
+            const logros = (data.logros || data.logros_recientes || snapshot?.logros || []).filter(Boolean);
+            const cursos = (data.cursos && data.cursos.length ? data.cursos : snapshot?.cursos) || [];
+            const leccionesRecomendadas = data.leccionesRecomendadas || progressStore?.getRecommendedLessons(8) || [];
 
             // Verificar si hay datos mínimos
             const tieneDatosMinimos = usuario.nivel || progreso.leccionesCompletadas !== undefined;
@@ -372,6 +517,10 @@
 
             // Configurar event listeners después de renderizar
             configurarEventListenersDinamicos();
+
+            if (leccionesRecomendadas.length) {
+                renderizarLeccionesRecomendadas(leccionesRecomendadas);
+            }
         }
 
         // ===================================
@@ -560,14 +709,17 @@
                     </div>
                     
                     <div class="space-y-4">
-                        ${leccionesRecientes.map(leccion => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verLeccion(${leccion.id})">
+                        ${leccionesRecientes.map(leccion => {
+                            const destinoLocal = leccion.idioma ? `irALecciones('${leccion.idioma}','${leccion.nivel || 'A1'}')` : `verLeccion(${leccion.id})`;
+                            const xp = leccion.xp_ganado || leccion.xp || 0;
+                            return `
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="${destinoLocal}">
                                 <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">${leccion.titulo || 'Lección completada'}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${leccion.xp_ganado || 0} XP</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">${leccion.titulo || `${leccion.idioma?.toUpperCase() || 'Lección'} ${leccion.nivel || ''}`}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${xp} XP</p>
                                 </div>
                                 <div class="text-right">
                                     <span class="text-2xl">✅</span>
@@ -599,13 +751,14 @@
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Tus Cursos</h3>
                     <div class="space-y-4">
                         ${cursos.map(curso => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso(${curso.id})">
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso('${curso.id || curso.idiomaKey}')">
                                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform text-white text-lg">
                                     ${curso.icono || '📚'}
                                 </div>
                                 <div class="flex-1">
                                     <p class="font-semibold text-gray-900 dark:text-white">${curso.nombre}</p>
                                     <p class="text-sm text-gray-600 dark:text-gray-400">${curso.nivel} - ${curso.progreso || 0}% completado</p>
+                                    ${curso.activo ? '<span class="inline-flex items-center mt-2 text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">Curso activo</span>' : ''}
                                     <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                                         <div class="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-2 transition-all duration-1000" style="width: ${curso.progreso || 0}%"></div>
                                     </div>
@@ -734,10 +887,13 @@
         // RENDERIZAR LECCIONES RECOMENDADAS
         // ===================================
         function renderizarLeccionesRecomendadas(lecciones) {
-            if (!elementos.contenidoDashboard || lecciones.length === 0) return;
+            if (!elementos.contenidoDashboard) return;
+            const existente = document.getElementById('recommended-lessons-section');
+            if (existente) existente.remove();
+            if (!lecciones.length) return;
 
             const html = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8">
+                <div id="recommended-lessons-section" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
                             Lecciones Recomendadas
@@ -746,7 +902,7 @@
                             ${lecciones.length} disponibles
                         </span>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         ${lecciones.map(leccion => `
                             <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 hover:shadow-lg transition-all">
@@ -758,18 +914,18 @@
                                         ${leccion.nivel}
                                     </span>
                                 </div>
-                                
+
                                 <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                     ${leccion.descripcion || 'Sin descripción'}
                                 </p>
-                                
+
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                                     <span>⏱️ ${leccion.duracion_minutos || 30} min</span>
-                                    <span>🌍 ${leccion.idioma || 'Inglés'}</span>
+                                    <span>🌍 ${leccion.idiomaLabel || leccion.idioma || 'Inglés'}</span>
                                 </div>
-                                
-                                <button 
-                                    onclick="iniciarLeccion(${leccion.id})"
+
+                                <button
+                                    onclick="iniciarLeccionRecomendada('${leccion.idioma || 'ingles'}','${leccion.nivel || 'A1'}')"
                                     class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                                     Comenzar Lección
                                 </button>
@@ -779,7 +935,7 @@
                 </div>
             `;
 
-            elementos.contenidoDashboard.innerHTML += html;
+            elementos.contenidoDashboard.insertAdjacentHTML('beforeend', html);
         }
 
         // ===================================
@@ -822,9 +978,26 @@
             // Los event listeners se configuran mediante onclick en los elementos
         }
 
+        elementos.logoutBtn?.addEventListener('click', manejarLogout);
+
+        async function manejarLogout() {
+            elementos.logoutBtn.disabled = true;
+            elementos.logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saliendo...';
+            try {
+                await window.apiClient.logout();
+            } catch (error) {
+                console.warn('⚠️ Error cerrando sesión:', error);
+            } finally {
+                localStorage.clear();
+                window.location.href = '/pages/auth/login.html';
+            }
+        }
+
         function mostrarEstadoSinDatos(mensaje) {
             console.error('📭 Estado sin datos:', mensaje);
-            
+
+            mostrarSeccionPrincipal();
+
             if (elementos.contenidoDashboard) {
                 elementos.contenidoDashboard.innerHTML = `
                     <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
@@ -860,6 +1033,7 @@
 
         function mostrarErrorDashboard(mensaje) {
             console.error('💥 Error dashboard:', mensaje);
+            mostrarSeccionPrincipal();
             mostrarEstadoSinDatos(mensaje);
         }
 
@@ -875,6 +1049,14 @@
         };
 
         window.verCurso = function(cursoId) {
+            const snapshot = progressStore?.getSnapshot();
+            const cursoIdString = `${cursoId}`;
+            if (!Number.isFinite(Number(cursoIdString))) {
+                const idioma = cursoIdString.split('-')[0] || snapshot?.idiomaKey || 'ingles';
+                const nivel = snapshot?.nivelActual || 'A1';
+                window.irALecciones(idioma, nivel);
+                return;
+            }
             window.location.href = `/pages/estudiante/curso-detalle.html?id=${cursoId}`;
         };
 
@@ -904,17 +1086,22 @@
             window.location.href = '/pages/estudiante/lecciones.html?filtro=principiante';
         };
 
+        window.iniciarLeccionRecomendada = function(idioma, nivel) {
+            const params = new URLSearchParams({ idioma, nivel, autoStart: 'true' });
+            window.location.href = `/pages/estudiante/lecciones.html?${params.toString()}`;
+        };
+
+        window.irALecciones = function(idioma, nivel = 'A1') {
+            const params = new URLSearchParams({ idioma, nivel, autoStart: 'true' });
+            window.location.href = `/pages/estudiante/lecciones.html?${params.toString()}`;
+        };
+
         // ===================================
         // INICIALIZACIÓN
         // ===================================
         
-        // Ocultar loading y mostrar contenido
-        if (elementos.loadingDashboard) {
-            elementos.loadingDashboard.classList.add('hidden');
-        }
-        if (elementos.contenidoDashboard) {
-            elementos.contenidoDashboard.classList.remove('hidden');
-        }
+        // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
+        prehidratarDashboardLocal();
 
         // Cargar datos
         await cargarResumen();
