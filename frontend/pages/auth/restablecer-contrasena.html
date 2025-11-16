@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - SpeakLexi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
+    <div class="fixed top-4 right-4 z-40">
+        <button id="theme-toggle" class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300">
+            <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg" id="theme-icon"></i>
+        </button>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">SpeakLexi</h1>
+                <p class="text-gray-600 dark:text-gray-300">Crea tu nueva contraseña segura</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl">
+                <div id="token-error" class="hidden mb-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-200"></div>
+
+                <div id="form-container" class="space-y-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 flex items-center justify-center mb-4">
+                            <i class="fas fa-lock text-transparent bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-1 dark:text-white">Restablece tu contraseña</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Introduce una nueva contraseña para la cuenta <span id="email-label" class="font-semibold text-gray-900 dark:text-white"></span></p>
+                    </div>
+
+                    <form id="reset-form" class="space-y-4">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nueva contraseña</label>
+                            <div class="relative">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <input type="password" id="password" name="password" minlength="8" required class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300" placeholder="Ingresa tu nueva contraseña">
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Debe tener al menos 8 caracteres.</p>
+                        </div>
+
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirmar contraseña</label>
+                            <div class="relative">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <input type="password" id="confirm-password" name="confirm-password" minlength="8" required class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300" placeholder="Confirma tu contraseña">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                            Guardar nueva contraseña
+                        </button>
+                    </form>
+                </div>
+
+                <div id="success-container" class="hidden text-center space-y-4">
+                    <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                        <i class="fas fa-check text-green-600 dark:text-green-300 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">¡Contraseña actualizada!</h2>
+                    <p class="text-gray-600 dark:text-gray-300">Ya puedes iniciar sesión con tu nueva contraseña.</p>
+                    <button id="go-login" class="w-full px-4 py-3 border border-transparent bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors">Ir al inicio de sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="/config/app-config.js"></script>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function syncThemeIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                themeIcon.className = 'fas fa-sun text-yellow-400 text-lg';
+            } else {
+                themeIcon.className = 'fas fa-moon text-gray-700 text-lg';
+            }
+        }
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        syncThemeIcon();
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            syncThemeIcon();
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const email = params.get('email');
+
+        const tokenError = document.getElementById('token-error');
+        const emailLabel = document.getElementById('email-label');
+        const formContainer = document.getElementById('form-container');
+        const successContainer = document.getElementById('success-container');
+        const resetForm = document.getElementById('reset-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const toastContainer = document.getElementById('toast-container');
+        const goLoginBtn = document.getElementById('go-login');
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 rounded-lg shadow-lg text-white flex items-center gap-2 animate-fade-in ${type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-600' : 'bg-blue-500'}`;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-circle-exclamation' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function mostrarErrorToken(mensaje) {
+            tokenError.textContent = mensaje;
+            tokenError.classList.remove('hidden');
+            formContainer.classList.add('hidden');
+        }
+
+        if (!token || !email) {
+            mostrarErrorToken('El enlace de recuperación es inválido o está incompleto. Solicita uno nuevo desde la página de recuperar contraseña.');
+        } else {
+            emailLabel.textContent = decodeURIComponent(email);
+        }
+
+        resetForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!token) {
+                mostrarErrorToken('Este enlace no contiene un token válido.');
+                return;
+            }
+
+            if (passwordInput.value.length < 8) {
+                showToast('La contraseña debe tener al menos 8 caracteres.', 'error');
+                return;
+            }
+
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showToast('Las contraseñas no coinciden.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+
+            try {
+                const apiBase = window.APP_CONFIG?.API?.API_URL || `${window.location.origin.replace('3000', '5000')}/api`;
+                const response = await fetch(`${apiBase}/auth/restablecer-contrasena`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, nueva_contrasena: passwordInput.value })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'No se pudo restablecer la contraseña');
+                }
+
+                formContainer.classList.add('hidden');
+                successContainer.classList.remove('hidden');
+                showToast('Contraseña actualizada correctamente', 'success');
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Guardar nueva contraseña';
+            }
+        });
+
+        goLoginBtn.addEventListener('click', () => {
+            window.location.href = '/pages/auth/login.html';
+        });
+
+        document.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('focus', function () {
+                this.parentElement.classList.add('ring-2', 'ring-purple-500', 'ring-opacity-50', 'rounded-lg');
+            });
+            input.addEventListener('blur', function () {
+                this.parentElement.classList.remove('ring-2', 'ring-purple-500', 'ring-opacity-50', 'rounded-lg');
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out; }
+    </style>
+</body>
+</html>
