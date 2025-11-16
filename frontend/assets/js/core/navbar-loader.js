@@ -14,6 +14,7 @@ class NavbarLoader {
     async init() {
         await this.loadNavbar();
         this.setupEventListeners();
+        this.configureStudentNav();
         console.log('✅ Navbar cargado');
     }
 
@@ -104,7 +105,7 @@ class NavbarLoader {
             // Menú móvil
             const mobileToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (mobileToggle && mobileMenu) {
                 mobileToggle.addEventListener('click', () => {
                     mobileMenu.classList.toggle('hidden');
@@ -118,7 +119,33 @@ class NavbarLoader {
                     window.themeManager.toggleTheme();
                 });
             }
+
+            this.configureStudentNav();
         }, 100);
+    }
+
+    configureStudentNav() {
+        const path = window.location.pathname || '';
+        const isStudentSection = path.includes('/pages/estudiante/');
+
+        const profileLink = document.getElementById('student-profile-link');
+        const changeCourseLink = document.getElementById('student-change-course-link');
+        const mobileLinks = document.getElementById('student-mobile-links');
+
+        const toggle = (element, show) => {
+            if (!element) return;
+            if (show) {
+                element.classList.remove('hidden');
+            } else {
+                if (!element.classList.contains('hidden')) {
+                    element.classList.add('hidden');
+                }
+            }
+        };
+
+        toggle(profileLink, isStudentSection);
+        toggle(changeCourseLink, isStudentSection);
+        toggle(mobileLinks, isStudentSection);
     }
 }
 

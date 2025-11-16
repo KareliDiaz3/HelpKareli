@@ -6,30 +6,337 @@
 (async () => {
     'use strict';
 
+    const FALLBACK_TIMESTAMP = new Date().toISOString();
+    const FALLBACK_DASHBOARD = Object.freeze({
+        usuario: {
+            nombre: 'Estudiante',
+            nivel: 'A1',
+            idioma: 'Inglés',
+            xp: 0,
+            racha_dias: 1
+        },
+        progreso: {
+            leccionesCompletadas: 0,
+            tiempoEstudio: 0,
+            general: 0
+        },
+        estadisticas: {
+            rachaActual: 1,
+            puntosTotales: 0,
+            lecciones_completadas: 0
+        },
+        cursos: [
+            {
+                id: 'ingles-general',
+                idiomaKey: 'ingles',
+                idiomaLabel: 'Inglés',
+                nombre: 'Inglés general',
+                icono: '🇬🇧',
+                nivel: 'A1',
+                progreso: 12,
+                xp: 0,
+                activo: true,
+                ultimoAcceso: FALLBACK_TIMESTAMP
+            }
+        ],
+        logros: [
+            {
+                id: 'primer_paso',
+                titulo: 'Primer Paso',
+                descripcion: 'Completaste tu primera lección en SpeakLexi.',
+                xp_otorgado: 50,
+                earned: true,
+                earnedAt: FALLBACK_TIMESTAMP
+            },
+            {
+                id: 'perfeccionista',
+                titulo: 'Perfeccionista',
+                descripcion: 'Lograste una lección perfecta con 10/10 aciertos.',
+                xp_otorgado: 80,
+                earned: true,
+                earnedAt: FALLBACK_TIMESTAMP
+            },
+            {
+                id: 'explorador_idiomas',
+                titulo: 'Explorador de Idiomas',
+                descripcion: 'Comienza cursos en dos idiomas distintos.',
+                xp_otorgado: 90,
+                earned: false,
+                earnedAt: null
+            }
+        ],
+        leccionesRecomendadas: [
+            { id: 'ingles-a1', titulo: 'Inglés A1', idioma: 'ingles', idiomaLabel: 'Inglés', nivel: 'A1', descripcion: '10 preguntas clave para tu nivel A1 de Inglés.', duracion_minutos: 15, icono: '🇬🇧' },
+            { id: 'ingles-a2', titulo: 'Inglés A2', idioma: 'ingles', idiomaLabel: 'Inglés', nivel: 'A2', descripcion: 'Perfecciona vocabulario y estructuras básicas.', duracion_minutos: 15, icono: '🇬🇧' },
+            { id: 'ingles-b1', titulo: 'Inglés B1', idioma: 'ingles', idiomaLabel: 'Inglés', nivel: 'B1', descripcion: 'Desarrolla comprensión intermedia con situaciones reales.', duracion_minutos: 15, icono: '🇬🇧' },
+            { id: 'frances-a1', titulo: 'Francés A1', idioma: 'frances', idiomaLabel: 'Francés', nivel: 'A1', descripcion: 'Aprende saludos y expresiones esenciales en francés.', duracion_minutos: 15, icono: '🇫🇷' },
+            { id: 'aleman-a1', titulo: 'Alemán A1', idioma: 'aleman', idiomaLabel: 'Alemán', nivel: 'A1', descripcion: 'Domina tus primeras frases en alemán.', duracion_minutos: 15, icono: '🇩🇪' },
+            { id: 'italiano-a1', titulo: 'Italiano A1', idioma: 'italiano', idiomaLabel: 'Italiano', nivel: 'A1', descripcion: 'Exprésate en italiano desde la primera clase.', duracion_minutos: 15, icono: '🇮🇹' }
+        ],
+        leccionesEnProgreso: [],
+        lecciones_completadas: []
+    });
+
+    function clonarDashboardFallback() {
+        return JSON.parse(JSON.stringify(FALLBACK_DASHBOARD));
+    }
+
+    function obtenerDebugFlag() {
+        if (typeof window === 'undefined') return false;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const debugParams = (params.getAll('debug') || []).join(',').toLowerCase();
+            const debugDashboard = params.get('dashboard-debug');
+            const storageFlag = window.localStorage ? localStorage.getItem('dashboardDebug') : null;
+            return (
+                debugParams.includes('dashboard') ||
+                debugDashboard === 'true' ||
+                (storageFlag === 'true')
+            );
+        } catch (error) {
+            return false;
+        }
+    }
+
+    const DASHBOARD_DEBUG_ENABLED = obtenerDebugFlag();
+    const diagnosticosDashboard = [];
+    let actualizarPanelDebug = () => {};
+    let dashboardInicializado = false;
+    let arranqueManualEnCurso = false;
+
+    function registrarDiagnostico(etapa, detalle, tipo = 'info') {
+        const registro = {
+            etapa,
+            detalle,
+            tipo,
+            timestamp: Date.now(),
+            hora: new Date().toLocaleTimeString()
+        };
+        diagnosticosDashboard.push(registro);
+
+        if (!DASHBOARD_DEBUG_ENABLED) return;
+
+        const logFn = tipo === 'error' ? console.error : tipo === 'warn' ? console.warn : console.log;
+        logFn(`[Dashboard][${registro.hora}] ${etapa}: ${detalle}`);
+        actualizarPanelDebug();
+    }
+
+    registrarDiagnostico('bootstrap', 'Script del dashboard cargado');
+
+    async function iniciarDashboardFallback(motivo, error) {
+        if (arranqueManualEnCurso) {
+            registrarDiagnostico('module-loader-fallback', `Intento ignorado (${motivo})`, 'warn');
+            return;
+        }
+
+        arranqueManualEnCurso = true;
+        registrarDiagnostico('module-loader-fallback', `Inicializando manualmente (${motivo})`, 'warn');
+
+        if (error) {
+            console.warn('⚠️  Motivo del fallback manual:', error);
+        }
+
+        try {
+            await inicializarDashboard();
+        } catch (fallbackError) {
+            console.error('💥 Error al inicializar manualmente el dashboard:', fallbackError);
+            mostrarErrorDependencias(
+                'No se pudo cargar el dashboard',
+                fallbackError?.message || 'Ocurrió un error durante la inicialización. Intenta recargar la página.'
+            );
+        }
+    }
+
+    if (typeof window !== 'undefined') {
+        window.dashboardDebugInfo = {
+            get enabled() {
+                return DASHBOARD_DEBUG_ENABLED;
+            },
+            get eventos() {
+                return [...diagnosticosDashboard];
+            }
+        };
+
+        window.toggleDashboardDebug = function(force) {
+            try {
+                const destino = typeof force === 'boolean' ? force : !DASHBOARD_DEBUG_ENABLED;
+                localStorage.setItem('dashboardDebug', destino ? 'true' : 'false');
+                console.info(`Modo debug del dashboard ${destino ? 'activado' : 'desactivado'}. Recarga la página para aplicar.`);
+                return destino;
+            } catch (error) {
+                console.error('No se pudo alternar el modo debug del dashboard', error);
+                return DASHBOARD_DEBUG_ENABLED;
+            }
+        };
+    }
+
+    // ============================================
+    // ELEMENTOS BASE PARA MANEJAR EL ESTADO DE CARGA
+    // ============================================
+    const cargaUI = {
+        contenido: document.getElementById('contenido-dashboard'),
+        loading: document.getElementById('loading-dashboard')
+    };
+
+    function mostrarSeccionPrincipal() {
+        if (cargaUI.loading) {
+            cargaUI.loading.classList.add('hidden');
+        }
+        if (cargaUI.contenido) {
+            cargaUI.contenido.classList.remove('hidden');
+        }
+    }
+
+    function mostrarErrorDependencias(titulo, detalle) {
+        mostrarSeccionPrincipal();
+
+        if (!cargaUI.contenido) return;
+
+        cargaUI.contenido.innerHTML = `
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-800/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-plug-circle-xmark text-red-600 dark:text-red-200 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-red-700 dark:text-red-100 mb-3">${titulo}</h3>
+                <p class="text-red-600 dark:text-red-200 mb-6">${detalle}</p>
+                <button class="px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors" onclick="window.location.reload()">
+                    <i class="fas fa-rotate-right mr-2"></i>Reintentar
+                </button>
+            </div>
+        `;
+    }
+
     // ============================================
     // ESPERAR DEPENDENCIAS
     // ============================================
-    const dependencias = ['APP_CONFIG', 'apiClient', 'ModuleLoader'];
+    const dependencias = ['APP_CONFIG', 'ModuleLoader'];
+    const moduleLoader = window.ModuleLoader;
+    let apiClientReadyPromise = null;
 
-    const inicializado = await window.ModuleLoader.initModule({
+    if (!moduleLoader || typeof moduleLoader.initModule !== 'function') {
+        registrarDiagnostico('module-loader', 'No disponible en window. Arrancando fallback.', 'warn');
+        await iniciarDashboardFallback('module-loader-no-disponible');
+        return;
+    }
+
+    const inicializado = await moduleLoader.initModule({
         moduleName: 'Dashboard Estudiante',
         dependencies: dependencias,
         onReady: inicializarDashboard,
         onError: (error) => {
             console.error('💥 Error al cargar dashboard:', error);
-            mostrarErrorDashboard('Error al cargar el dashboard');
+            iniciarDashboardFallback('module-loader-error', error);
         }
     });
 
-    if (!inicializado) return;
+    if (!inicializado) {
+        const faltantes = dependencias.filter(dep => !window[dep]);
+        registrarDiagnostico(
+            'module-loader',
+            faltantes.length
+                ? `Dependencias ausentes: ${faltantes.join(', ')}`
+                : 'ModuleLoader no pudo confirmar dependencias',
+            'warn'
+        );
+        await iniciarDashboardFallback('dependencias-incompletas');
+        return;
+    }
+
+    function esperarApiClient(maxWait = 10000) {
+        return new Promise((resolve, reject) => {
+            const start = Date.now();
+            const interval = setInterval(() => {
+                if (window.apiClient) {
+                    clearInterval(interval);
+                    resolve(window.apiClient);
+                    return;
+                }
+                if (window.APIClient) {
+                    window.apiClient = new window.APIClient();
+                    clearInterval(interval);
+                    resolve(window.apiClient);
+                    return;
+                }
+
+                if (Date.now() - start >= maxWait) {
+                    clearInterval(interval);
+                    reject(new Error('apiClient no estuvo listo dentro del tiempo esperado'));
+                }
+            }, 50);
+        });
+    }
+
+    function cargarScriptAsync(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+            document.head.appendChild(script);
+        });
+    }
+
+    async function asegurarApiClient() {
+        if (window.apiClient) {
+            registrarDiagnostico('api-client', 'Se reutilizó la instancia global existente');
+            return window.apiClient;
+        }
+
+        if (window.APIClient) {
+            window.apiClient = new window.APIClient();
+            registrarDiagnostico('api-client', 'Se creó una instancia nueva desde APIClient');
+            return window.apiClient;
+        }
+
+        if (!apiClientReadyPromise) {
+            registrarDiagnostico('api-client', 'Esperando a que apiClient esté disponible en la ventana');
+            apiClientReadyPromise = esperarApiClient();
+        }
+
+        try {
+            const clienteListo = await apiClientReadyPromise;
+            registrarDiagnostico('api-client', 'apiClient listo tras espera activa');
+            return clienteListo;
+        } catch (error) {
+            registrarDiagnostico('api-client-timeout', error.message, 'warn');
+            console.warn('⌛ apiClient no estuvo listo a tiempo, reintentando con carga directa...', error);
+            apiClientReadyPromise = null;
+
+            try {
+                await cargarScriptAsync('/assets/js/core/api-client.js');
+                registrarDiagnostico('api-client', 'Script del cliente API recargado manualmente');
+            } catch (cargaError) {
+                registrarDiagnostico('api-client-error', cargaError.message, 'error');
+                throw new Error(`No se pudo cargar el cliente API: ${cargaError.message}`);
+            }
+
+            if (window.apiClient) {
+                registrarDiagnostico('api-client', 'apiClient disponible tras recarga');
+                return window.apiClient;
+            }
+
+            if (window.APIClient) {
+                window.apiClient = new window.APIClient();
+                registrarDiagnostico('api-client', 'APIClient instanciado tras recarga');
+                return window.apiClient;
+            }
+
+            registrarDiagnostico('api-client-error', 'apiClient siguió sin inicializar después del reintento', 'error');
+            throw new Error('apiClient sigue sin inicializar después del reintento');
+        }
+    }
 
     // ============================================
     // FUNCIÓN PRINCIPAL
     // ============================================
     async function inicializarDashboard() {
+        if (dashboardInicializado) {
+            registrarDiagnostico('bootstrap', 'Inicialización ignorada (ya se ejecutó)');
+            return;
+        }
+        dashboardInicializado = true;
         console.log('✅ Dashboard Estudiante iniciando...');
-
-        const client = window.apiClient;
 
         // ===================================
         // ELEMENTOS DEL DOM
@@ -41,76 +348,125 @@
             leccionesCompletadasStat: document.getElementById('lecciones-completadas-stat'),
             nivelUsuarioStat: document.getElementById('nivel-usuario-stat'),
             idiomaAprendizajeStat: document.getElementById('idioma-aprendizaje-stat'),
-            
+
             // Contenedor principal
             contenidoDashboard: document.getElementById('contenido-dashboard'),
             loadingDashboard: document.getElementById('loading-dashboard'),
-            
+
             // Greeting
-            greeting: document.getElementById('greeting')
+            greeting: document.getElementById('greeting'),
+            logoutBtn: document.getElementById('logout-dashboard-btn')
         };
+
+        mostrarSeccionPrincipal();
+        registrarDiagnostico('ui', 'Contenedor principal visible');
+
+        let client;
+        const progressStore = window.StudentProgress || null;
+        let seUsoDashboardLocal = false;
+        let prehidratadoConLocal = false;
+        let seUsoFallbackBase = false;
+
+        if (progressStore) {
+            registrarDiagnostico('student-progress', 'StudentProgress disponible en la ventana');
+        } else {
+            registrarDiagnostico('student-progress', 'StudentProgress no está disponible. Se usará maqueta local.', 'warn');
+        }
+
+        actualizarPanelDebug = function() {
+            if (!DASHBOARD_DEBUG_ENABLED || !elementos.contenidoDashboard) return;
+
+            let panel = document.getElementById('dashboard-debug-panel');
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'dashboard-debug-panel';
+                panel.className = 'mb-6 rounded-2xl border-2 border-dashed border-purple-300 bg-white/80 dark:bg-gray-900/40 p-4 text-sm text-gray-700 dark:text-gray-100 shadow-inner backdrop-blur';
+                elementos.contenidoDashboard.prepend(panel);
+            }
+
+            const lista = diagnosticosDashboard
+                .slice(-8)
+                .map((item) => {
+                    const color = item.tipo === 'error'
+                        ? 'text-red-600 dark:text-red-300'
+                        : item.tipo === 'warn'
+                            ? 'text-amber-600 dark:text-amber-300'
+                            : 'text-gray-700 dark:text-gray-200';
+                    return `
+                        <li class="flex items-start gap-2">
+                            <span class="text-xs font-semibold text-purple-600 dark:text-purple-300">${item.hora}</span>
+                            <span class="text-xs uppercase tracking-wide ${color}">${item.etapa}</span>
+                            <span class="text-xs text-gray-600 dark:text-gray-300">${item.detalle}</span>
+                        </li>
+                    `;
+                })
+                .join('');
+
+            panel.innerHTML = `
+                <p class="text-xs font-semibold text-purple-700 dark:text-purple-200 mb-2 flex items-center gap-2">
+                    <i class="fas fa-bug"></i>
+                    Modo debug del dashboard activo (${diagnosticosDashboard.length} eventos)
+                </p>
+                <ul class="space-y-1 max-h-60 overflow-auto pr-2">${lista || '<li class="text-xs text-gray-500">Sin eventos aún</li>'}</ul>
+            `;
+        };
+
+        try {
+            client = await asegurarApiClient();
+            registrarDiagnostico('api-client', 'Cliente API asegurado correctamente');
+        } catch (error) {
+            registrarDiagnostico('api-client-error', error.message, 'error');
+            console.error('💥 No fue posible asegurar apiClient para el dashboard:', error);
+            mostrarErrorDependencias('No se pudo preparar el dashboard', 'No fue posible inicializar el cliente API en el navegador. Recarga la página o verifica que /assets/js/core/api-client.js esté accesible.');
+            return;
+        }
 
         // ===================================
         // CARGAR RESUMEN DEL ESTUDIANTE - CORREGIDO
         // ===================================
         async function cargarResumen() {
             try {
+                registrarDiagnostico('api', 'Solicitando /progreso/resumen');
                 console.log('🔄 Cargando resumen del estudiante...');
-                
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
+
                 const resultado = await client.get('/progreso/resumen');
-                
                 console.log('🔍 DEBUG Resultado completo:', resultado);
 
-                // Verificar si la petición fue exitosa
                 if (!resultado.success) {
-                    console.warn('⚠️ Petición no exitosa:', resultado.error);
-                    
-                    // Si es 404, es usuario nuevo
+                    registrarDiagnostico('api', `Respuesta no exitosa (${resultado.status || 'sin status'})`, 'warn');
                     if (resultado.status === 404) {
-                        mostrarEstadoInicial();
+                        if (!mostrarDashboardLocal('api-404')) {
+                            mostrarEstadoInicial();
+                        }
                         return;
                     }
-                    
                     throw new Error(resultado.error || `Error HTTP: ${resultado.status}`);
                 }
 
-                // ✅ Los datos están en resultado.data
-                const data = resultado.data;
-                console.log('📊 Datos del dashboard cargados:', data);
-
-                // Verificar estructura de datos
-                if (!data || typeof data !== 'object') {
-                    throw new Error('Respuesta inválida del servidor');
-                }
-
-                // Verificar si hay datos reales
-                const datosReales = data.data || data;
-                
-                if (!datosReales || Object.keys(datosReales).length === 0) {
-                    console.warn('⚠️ No hay datos disponibles, mostrando estado inicial');
-                    mostrarEstadoInicial();
+                const datosReales = resultado.data?.data || resultado.data;
+                if (!datosReales || typeof datosReales !== 'object' || Object.keys(datosReales).length === 0) {
+                    console.warn('⚠️ No hay datos disponibles desde API, usando progreso local');
+                    registrarDiagnostico('api', 'Respuesta vacía, se usa fuente local', 'warn');
+                    if (!mostrarDashboardLocal('api-vacio')) {
+                        mostrarEstadoInicial();
+                    }
                     return;
                 }
 
-                // Actualizar stats superiores
                 actualizarStatsSuperiores(datosReales);
-
-                // Renderizar contenido dinámico
                 renderizarContenidoDinamico(datosReales);
-
-                // Cargar lecciones recomendadas
                 await cargarLeccionesRecomendadas();
+                registrarDiagnostico('api', 'Resumen sincronizado correctamente');
 
             } catch (error) {
                 console.error('❌ Error al cargar resumen:', error);
-                console.error('🔍 Stack trace:', error.stack);
-                
-                // Si el error es 404 o no hay datos, mostrar estado inicial
-                if (error.message.includes('404') || error.message.includes('No hay datos')) {
-                    mostrarEstadoInicial();
-                } else {
-                    mostrarEstadoSinDatos('No se pudo conectar con el servidor. Intenta más tarde.');
+                registrarDiagnostico('api-error', error.message || 'Error desconocido', 'error');
+                if (!mostrarDashboardLocal('api-error')) {
+                    if (error.message.includes('404') || error.message.includes('No hay datos')) {
+                        mostrarEstadoInicial();
+                    } else {
+                        mostrarEstadoSinDatos('No se pudo conectar con el servidor. Intenta más tarde.');
+                    }
                 }
             }
         }
@@ -121,34 +477,83 @@
         async function cargarLeccionesRecomendadas() {
             try {
                 console.log('🔄 Cargando lecciones recomendadas...');
-                
-                // ✅ apiClient.get() YA DEVUELVE EL OBJETO PARSEADO
+
+                let locales = [];
+                if (progressStore) {
+                    locales = progressStore.getRecommendedLessons(8);
+                    registrarDiagnostico('lecciones', `StudentProgress devolvió ${locales.length} recomendaciones`);
+                }
+
+                if (!locales.length) {
+                    locales = obtenerFallbackLecciones();
+                    registrarDiagnostico('lecciones', 'Se usó maqueta local para recomendaciones', 'warn');
+                }
+
+                if (locales.length) {
+                    renderizarLeccionesRecomendadas(locales);
+                }
+
                 const resultado = await client.get('/progreso/lecciones-recomendadas');
-                
                 console.log('📚 Resultado lecciones recomendadas:', resultado);
 
-                // Si la petición no fue exitosa, salir silenciosamente
                 if (!resultado.success) {
                     console.warn('⚠️ No se pudieron cargar lecciones recomendadas:', resultado.error);
+                    registrarDiagnostico('lecciones', `Error API: ${resultado.error || 'desconocido'}`, 'warn');
                     return;
                 }
 
-                // ✅ Los datos están en resultado.data
                 const data = resultado.data;
-                
-                // Manejar diferentes estructuras de respuesta
                 const leccionesRecomendadas = data.lecciones_recomendadas || data.data || data || [];
-                
+
                 if (Array.isArray(leccionesRecomendadas) && leccionesRecomendadas.length > 0) {
+                    registrarDiagnostico('lecciones', `API devolvió ${leccionesRecomendadas.length} recomendaciones`);
                     renderizarLeccionesRecomendadas(leccionesRecomendadas);
                 } else {
                     console.log('ℹ️ No hay lecciones recomendadas disponibles');
+                    registrarDiagnostico('lecciones', 'API no devolvió recomendaciones', 'warn');
                 }
 
             } catch (error) {
                 console.error('❌ Error al cargar lecciones recomendadas:', error);
-                // No mostramos error al usuario para lecciones recomendadas
+                registrarDiagnostico('lecciones-error', error.message || 'Fallo desconocido', 'error');
             }
+        }
+
+        function prehidratarDashboardLocal() {
+            if (prehidratadoConLocal) return;
+            const data = obtenerDatosLocales('pre-hidratación');
+            if (!data) return;
+            prehidratadoConLocal = true;
+            actualizarStatsSuperiores(data);
+            renderizarContenidoDinamico(data);
+            const fallbackLessons = data.leccionesRecomendadas || data.lecciones_recomendadas || [];
+            renderizarLeccionesRecomendadas(fallbackLessons);
+        }
+
+        function mostrarDashboardLocal(motivo = 'respaldo') {
+            if (seUsoDashboardLocal) return true;
+            const data = obtenerDatosLocales(motivo);
+            if (!data) return false;
+            actualizarStatsSuperiores(data);
+            renderizarContenidoDinamico(data);
+            const fallbackLessons = data.leccionesRecomendadas || data.lecciones_recomendadas || [];
+            renderizarLeccionesRecomendadas(fallbackLessons);
+            seUsoDashboardLocal = true;
+            return true;
+        }
+
+        function obtenerDatosLocales(motivo = 'local') {
+            if (progressStore) {
+                const data = progressStore.getDashboardData();
+                if (data) {
+                    registrarDiagnostico('datos-locales', `Se usaron datos de StudentProgress (${motivo})`);
+                    return data;
+                }
+            }
+
+            seUsoFallbackBase = true;
+            registrarDiagnostico('datos-locales', `Se usó la maqueta base (${motivo})`, 'warn');
+            return clonarDashboardFallback();
         }
 
         // ===================================
@@ -156,7 +561,11 @@
         // ===================================
         function mostrarEstadoInicial() {
             console.log('🆕 Mostrando estado inicial para usuario nuevo');
-            
+
+            if (mostrarDashboardLocal()) {
+                return;
+            }
+
             // Resetear stats a valores iniciales
             if (elementos.diasRachaStat) elementos.diasRachaStat.textContent = '0';
             if (elementos.totalXPStat) elementos.totalXPStat.textContent = '0';
@@ -278,38 +687,40 @@
             const usuario = data.usuario || data.perfil || {};
             const progreso = data.progreso || data.estadisticas || {};
             const estadisticas = data.estadisticas || {};
+            const snapshot = progressStore?.getSnapshot();
 
             console.log('📈 Actualizando stats con:', { usuario, progreso, estadisticas });
 
-            // Racha 
+            // Racha
             if (elementos.diasRachaStat) {
-                elementos.diasRachaStat.textContent = estadisticas.rachaActual || usuario.racha_dias || 0;
+                elementos.diasRachaStat.textContent = estadisticas.rachaActual || usuario.racha_dias || snapshot?.rachaDias || 0;
             }
 
             // XP Total
             if (elementos.totalXPStat) {
-                elementos.totalXPStat.textContent = usuario.xp || usuario.total_xp || estadisticas.puntosTotales || 0;
+                elementos.totalXPStat.textContent = usuario.xp || usuario.total_xp || estadisticas.puntosTotales || snapshot?.xp || 0;
             }
 
             // Lecciones Completadas
             if (elementos.leccionesCompletadasStat) {
-                elementos.leccionesCompletadasStat.textContent = 
-                    progreso.leccionesCompletadas || 
-                    estadisticas.lecciones_completadas || 
+                elementos.leccionesCompletadasStat.textContent =
+                    progreso.leccionesCompletadas ||
+                    estadisticas.lecciones_completadas ||
+                    snapshot?.totalLecciones ||
                     0;
             }
 
             // Nivel e Idioma
             if (elementos.nivelUsuarioStat) {
-                elementos.nivelUsuarioStat.textContent = usuario.nivel || usuario.nivel_actual || 'A1';
+                elementos.nivelUsuarioStat.textContent = usuario.nivel || usuario.nivel_actual || snapshot?.nivelActual || 'A1';
             }
             if (elementos.idiomaAprendizajeStat) {
-                elementos.idiomaAprendizajeStat.textContent = usuario.idioma || usuario.idioma_aprendizaje || 'Inglés';
+                elementos.idiomaAprendizajeStat.textContent = usuario.idioma || usuario.idioma_aprendizaje || snapshot?.idiomaActual || 'Inglés';
             }
 
             // Actualizar greeting
             if (elementos.greeting) {
-                const nombre = usuario.nombre || 'Estudiante';
+                const nombre = usuario.nombre || snapshot?.nombreCompleto || snapshot?.nombre || 'Estudiante';
                 const hora = new Date().getHours();
                 let saludo = 'Buenos días';
                 if (hora >= 12 && hora < 19) saludo = 'Buenas tardes';
@@ -328,10 +739,11 @@
             const usuario = data.usuario || data.perfil || {};
             const progreso = data.progreso || data.estadisticas || {};
             const leccionesEnProgreso = data.leccionesEnProgreso || data.lecciones_en_progreso || [];
-            const leccionesCompletadas = data.leccionesCompletadas || data.lecciones_completadas || data.actividadReciente || [];
-            const logros = data.logros || data.logros_recientes || [];
-            const cursos = data.cursos || [];
-            const leccionesRecomendadas = data.leccionesRecomendadas || [];
+            const snapshot = progressStore?.getSnapshot();
+            const leccionesCompletadas = data.leccionesCompletadas || data.lecciones_completadas || data.actividadReciente || snapshot?.historial || [];
+            const logros = (data.logros || data.logros_recientes || snapshot?.logros || []).filter(Boolean);
+            const cursos = (data.cursos && data.cursos.length ? data.cursos : snapshot?.cursos) || [];
+            const leccionesRecomendadas = data.leccionesRecomendadas || progressStore?.getRecommendedLessons(8) || [];
 
             // Verificar si hay datos mínimos
             const tieneDatosMinimos = usuario.nivel || progreso.leccionesCompletadas !== undefined;
@@ -372,6 +784,10 @@
 
             // Configurar event listeners después de renderizar
             configurarEventListenersDinamicos();
+
+            if (leccionesRecomendadas.length) {
+                renderizarLeccionesRecomendadas(leccionesRecomendadas);
+            }
         }
 
         // ===================================
@@ -536,7 +952,7 @@
 
         function generarLeccionesRecientes(leccionesCompletadas) {
             const leccionesRecientes = leccionesCompletadas.slice(0, 3);
-            
+
             if (leccionesRecientes.length === 0) {
                 return `
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -552,29 +968,42 @@
                 `;
             }
 
+            const tarjetasRecientes = leccionesRecientes
+                .map((leccion) => {
+                    const destinoLocal = leccion.idioma
+                        ? `irALecciones('${leccion.idioma}','${leccion.nivel || 'A1'}')`
+                        : `verLeccion(${leccion.id})`;
+                    const xp = leccion.xp_ganado || leccion.xp || 0;
+                    const titulo = leccion.titulo || `${leccion.idioma?.toUpperCase() || 'Lección'} ${leccion.nivel || ''}`;
+                    const fecha = formatearFecha(leccion.fechaActualizacion || leccion.fecha_completada);
+
+                    return `
+                        <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="${destinoLocal}">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 dark:text-white">${titulo}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${xp} XP</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl">✅</span>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${fecha}</p>
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecciones Recientes</h3>
                         <button onclick="verTodasLecciones()" class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todas</button>
                     </div>
-                    
+
                     <div class="space-y-4">
-                        ${leccionesRecientes.map(leccion => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verLeccion(${leccion.id})">
-                                <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">${leccion.titulo || 'Lección completada'}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${leccion.xp_ganado || 0} XP</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-2xl">✅</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${formatearFecha(leccion.fechaActualizacion || leccion.fecha_completada)}</p>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${tarjetasRecientes}
                     </div>
                 </div>
             `;
@@ -594,25 +1023,30 @@
                 `;
             }
 
+            const cursosHtml = cursos
+                .map((curso) => `
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso('${curso.id || curso.idiomaKey}')">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform text-white text-lg">
+                            ${curso.icono || '📚'}
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-900 dark:text-white">${curso.nombre}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${curso.nivel} - ${curso.progreso || 0}% completado</p>
+                            ${curso.activo ? '<span class="inline-flex items-center mt-2 text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">Curso activo</span>' : ''}
+                            <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-2 transition-all duration-1000" style="width: ${curso.progreso || 0}%"></div>
+                            </div>
+                        </div>
+                        <span class="text-2xl">${curso.icono || '📚'}</span>
+                    </div>
+                `)
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Tus Cursos</h3>
                     <div class="space-y-4">
-                        ${cursos.map(curso => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso(${curso.id})">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform text-white text-lg">
-                                    ${curso.icono || '📚'}
-                                </div>
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">${curso.nombre}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">${curso.nivel} - ${curso.progreso || 0}% completado</p>
-                                    <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                                        <div class="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-2 transition-all duration-1000" style="width: ${curso.progreso || 0}%"></div>
-                                    </div>
-                                </div>
-                                <span class="text-2xl">${curso.icono || '📚'}</span>
-                            </div>
-                        `).join('')}
+                        ${cursosHtml}
                     </div>
                 </div>
             `;
@@ -673,28 +1107,33 @@
                 `;
             }
 
+            const logrosHtml = logros
+                .slice(0, 3)
+                .map((logro) => `
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
+                        <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 dark:text-white">${logro.titulo || 'Logro desbloqueado'}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${logro.descripcion || '¡Felicidades!'}</p>
+                            <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                                <i class="fas fa-gem"></i>
+                                <span>+${logro.xp_otorgado || 50} XP</span>
+                            </div>
+                        </div>
+                    </div>
+                `)
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros Recientes</h3>
                     </div>
-                    
+
                     <div class="space-y-4">
-                        ${logros.slice(0, 3).map(logro => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
-                                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
-                                    <span class="text-2xl">🎯</span>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-900 dark:text-white">${logro.titulo || 'Logro desbloqueado'}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">${logro.descripcion || '¡Felicidades!'}</p>
-                                    <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
-                                        <i class="fas fa-gem"></i>
-                                        <span>+${logro.xp_otorgado || 50} XP</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${logrosHtml}
                     </div>
                 </div>
             `;
@@ -733,53 +1172,76 @@
         // ===================================
         // RENDERIZAR LECCIONES RECOMENDADAS
         // ===================================
-        function renderizarLeccionesRecomendadas(lecciones) {
-            if (!elementos.contenidoDashboard || lecciones.length === 0) return;
+        function renderizarLeccionesRecomendadas(lecciones = []) {
+            if (!elementos.contenidoDashboard) return;
+            const existente = document.getElementById('recommended-lessons-section');
+            if (existente) existente.remove();
+            const lista = lecciones.length ? lecciones : obtenerFallbackLecciones();
+            if (!lista.length) {
+                registrarDiagnostico('lecciones', 'No hay lecciones para renderizar', 'warn');
+                elementos.contenidoDashboard.insertAdjacentHTML('beforeend', `
+                    <div id="recommended-lessons-section" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8 border border-dashed border-gray-300 dark:border-gray-600 text-center">
+                        <p class="text-gray-500 dark:text-gray-300">No hay recomendaciones disponibles por ahora.</p>
+                    </div>
+                `);
+                return;
+            }
+
+            registrarDiagnostico('lecciones', `Renderizando ${lista.length} recomendaciones visibles`);
+
+            const tarjetasHtml = lista
+                .map((leccion) => `
+                    <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                                ${leccion.titulo}
+                            </h3>
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                                ${leccion.nivel}
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                            ${leccion.descripcion || 'Sin descripción'}
+                        </p>
+
+                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <span>⏱️ ${leccion.duracion_minutos || 30} min</span>
+                            <span>🌍 ${leccion.idiomaLabel || leccion.idioma || 'Inglés'}</span>
+                        </div>
+
+                        <button
+                            onclick="iniciarLeccionRecomendada('${leccion.idioma || 'ingles'}','${leccion.nivel || 'A1'}')"
+                            class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            Comenzar Lección
+                        </button>
+                    </div>
+                `)
+                .join('');
 
             const html = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8">
+                <div id="recommended-lessons-section" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
                             Lecciones Recomendadas
                         </h2>
                         <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
-                            ${lecciones.length} disponibles
+                            ${lista.length} disponibles
                         </span>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        ${lecciones.map(leccion => `
-                            <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 hover:shadow-lg transition-all">
-                                <div class="flex justify-between items-start mb-4">
-                                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">
-                                        ${leccion.titulo}
-                                    </h3>
-                                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                                        ${leccion.nivel}
-                                    </span>
-                                </div>
-                                
-                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                                    ${leccion.descripcion || 'Sin descripción'}
-                                </p>
-                                
-                                <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                    <span>⏱️ ${leccion.duracion_minutos || 30} min</span>
-                                    <span>🌍 ${leccion.idioma || 'Inglés'}</span>
-                                </div>
-                                
-                                <button 
-                                    onclick="iniciarLeccion(${leccion.id})"
-                                    class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                                    Comenzar Lección
-                                </button>
-                            </div>
-                        `).join('')}
+                        ${tarjetasHtml}
                     </div>
                 </div>
             `;
 
-            elementos.contenidoDashboard.innerHTML += html;
+            elementos.contenidoDashboard.insertAdjacentHTML('beforeend', html);
+        }
+
+        function obtenerFallbackLecciones() {
+            const data = clonarDashboardFallback();
+            return data.leccionesRecomendadas || [];
         }
 
         // ===================================
@@ -822,9 +1284,27 @@
             // Los event listeners se configuran mediante onclick en los elementos
         }
 
+        elementos.logoutBtn?.addEventListener('click', manejarLogout);
+
+        async function manejarLogout() {
+            elementos.logoutBtn.disabled = true;
+            elementos.logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saliendo...';
+            try {
+                await window.apiClient.logout();
+            } catch (error) {
+                console.warn('⚠️ Error cerrando sesión:', error);
+            } finally {
+                localStorage.clear();
+                window.location.href = '/pages/auth/login.html';
+            }
+        }
+
         function mostrarEstadoSinDatos(mensaje) {
             console.error('📭 Estado sin datos:', mensaje);
-            
+            registrarDiagnostico('estado', mensaje, 'warn');
+
+            mostrarSeccionPrincipal();
+
             if (elementos.contenidoDashboard) {
                 elementos.contenidoDashboard.innerHTML = `
                     <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
@@ -860,6 +1340,7 @@
 
         function mostrarErrorDashboard(mensaje) {
             console.error('💥 Error dashboard:', mensaje);
+            mostrarSeccionPrincipal();
             mostrarEstadoSinDatos(mensaje);
         }
 
@@ -875,6 +1356,14 @@
         };
 
         window.verCurso = function(cursoId) {
+            const snapshot = progressStore?.getSnapshot();
+            const cursoIdString = `${cursoId}`;
+            if (!Number.isFinite(Number(cursoIdString))) {
+                const idioma = cursoIdString.split('-')[0] || snapshot?.idiomaKey || 'ingles';
+                const nivel = snapshot?.nivelActual || 'A1';
+                window.irALecciones(idioma, nivel);
+                return;
+            }
             window.location.href = `/pages/estudiante/curso-detalle.html?id=${cursoId}`;
         };
 
@@ -904,20 +1393,27 @@
             window.location.href = '/pages/estudiante/lecciones.html?filtro=principiante';
         };
 
+        window.iniciarLeccionRecomendada = function(idioma, nivel) {
+            const params = new URLSearchParams({ idioma, nivel, autoStart: 'true' });
+            window.location.href = `/pages/estudiante/lecciones.html?${params.toString()}`;
+        };
+
+        window.irALecciones = function(idioma, nivel = 'A1') {
+            const params = new URLSearchParams({ idioma, nivel, autoStart: 'true' });
+            window.location.href = `/pages/estudiante/lecciones.html?${params.toString()}`;
+        };
+
         // ===================================
         // INICIALIZACIÓN
         // ===================================
         
-        // Ocultar loading y mostrar contenido
-        if (elementos.loadingDashboard) {
-            elementos.loadingDashboard.classList.add('hidden');
-        }
-        if (elementos.contenidoDashboard) {
-            elementos.contenidoDashboard.classList.remove('hidden');
-        }
+        // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
+        registrarDiagnostico('pre-hidratacion', 'Iniciando prehidratación con datos locales o fallback');
+        prehidratarDashboardLocal();
 
         // Cargar datos
         await cargarResumen();
+        registrarDiagnostico('api', 'Proceso inicial de carga completado');
 
         console.log('✅ Dashboard Estudiante listo');
     }
