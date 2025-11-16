@@ -66,6 +66,42 @@
     }
 
     // ============================================
+    // ELEMENTOS BASE PARA MANEJAR EL ESTADO DE CARGA
+    // ============================================
+    const cargaUI = {
+        contenido: document.getElementById('contenido-dashboard'),
+        loading: document.getElementById('loading-dashboard')
+    };
+
+    function mostrarSeccionPrincipal() {
+        if (cargaUI.loading) {
+            cargaUI.loading.classList.add('hidden');
+        }
+        if (cargaUI.contenido) {
+            cargaUI.contenido.classList.remove('hidden');
+        }
+    }
+
+    function mostrarErrorDependencias(titulo, detalle) {
+        mostrarSeccionPrincipal();
+
+        if (!cargaUI.contenido) return;
+
+        cargaUI.contenido.innerHTML = `
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-800/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-plug-circle-xmark text-red-600 dark:text-red-200 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-red-700 dark:text-red-100 mb-3">${titulo}</h3>
+                <p class="text-red-600 dark:text-red-200 mb-6">${detalle}</p>
+                <button class="px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors" onclick="window.location.reload()">
+                    <i class="fas fa-rotate-right mr-2"></i>Reintentar
+                </button>
+            </div>
+        `;
+    }
+
+    // ============================================
     // ESPERAR DEPENDENCIAS
     // ============================================
     const dependencias = ['APP_CONFIG', 'ModuleLoader'];
@@ -708,7 +744,7 @@
 
         function generarLeccionesRecientes(leccionesCompletadas) {
             const leccionesRecientes = leccionesCompletadas.slice(0, 3);
-            
+
             if (leccionesRecientes.length === 0) {
                 return `
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -724,32 +760,42 @@
                 `;
             }
 
+            const tarjetasRecientes = leccionesRecientes
+                .map((leccion) => {
+                    const destinoLocal = leccion.idioma
+                        ? `irALecciones('${leccion.idioma}','${leccion.nivel || 'A1'}')`
+                        : `verLeccion(${leccion.id})`;
+                    const xp = leccion.xp_ganado || leccion.xp || 0;
+                    const titulo = leccion.titulo || `${leccion.idioma?.toUpperCase() || 'Lección'} ${leccion.nivel || ''}`;
+                    const fecha = formatearFecha(leccion.fechaActualizacion || leccion.fecha_completada);
+
+                    return `
+                        <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="${destinoLocal}">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 dark:text-white">${titulo}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${xp} XP</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl">✅</span>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${fecha}</p>
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Lecciones Recientes</h3>
                         <button onclick="verTodasLecciones()" class="text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold transition-colors duration-200">Ver todas</button>
                     </div>
-                    
+
                     <div class="space-y-4">
-                        ${leccionesRecientes.map(leccion => {
-                            const destinoLocal = leccion.idioma ? `irALecciones('${leccion.idioma}','${leccion.nivel || 'A1'}')` : `verLeccion(${leccion.id})`;
-                            const xp = leccion.xp_ganado || leccion.xp || 0;
-                            return `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="${destinoLocal}">
-                                <div class="w-12 h-12 bg-green-100 dark:bg-green-800 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">${leccion.titulo || `${leccion.idioma?.toUpperCase() || 'Lección'} ${leccion.nivel || ''}`}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Completado - ${xp} XP</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-2xl">✅</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${formatearFecha(leccion.fechaActualizacion || leccion.fecha_completada)}</p>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${tarjetasRecientes}
                     </div>
                 </div>
             `;
@@ -769,26 +815,30 @@
                 `;
             }
 
+            const cursosHtml = cursos
+                .map((curso) => `
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso('${curso.id || curso.idiomaKey}')">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform text-white text-lg">
+                            ${curso.icono || '📚'}
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-900 dark:text-white">${curso.nombre}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${curso.nivel} - ${curso.progreso || 0}% completado</p>
+                            ${curso.activo ? '<span class="inline-flex items-center mt-2 text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">Curso activo</span>' : ''}
+                            <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-2 transition-all duration-1000" style="width: ${curso.progreso || 0}%"></div>
+                            </div>
+                        </div>
+                        <span class="text-2xl">${curso.icono || '📚'}</span>
+                    </div>
+                `)
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Tus Cursos</h3>
                     <div class="space-y-4">
-                        ${cursos.map(curso => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer group transform hover:-translate-y-0.5" onclick="verCurso('${curso.id || curso.idiomaKey}')">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform text-white text-lg">
-                                    ${curso.icono || '📚'}
-                                </div>
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">${curso.nombre}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">${curso.nivel} - ${curso.progreso || 0}% completado</p>
-                                    ${curso.activo ? '<span class="inline-flex items-center mt-2 text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">Curso activo</span>' : ''}
-                                    <div class="mt-2 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                                        <div class="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-2 transition-all duration-1000" style="width: ${curso.progreso || 0}%"></div>
-                                    </div>
-                                </div>
-                                <span class="text-2xl">${curso.icono || '📚'}</span>
-                            </div>
-                        `).join('')}
+                        ${cursosHtml}
                     </div>
                 </div>
             `;
@@ -849,28 +899,33 @@
                 `;
             }
 
+            const logrosHtml = logros
+                .slice(0, 3)
+                .map((logro) => `
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
+                        <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 dark:text-white">${logro.titulo || 'Logro desbloqueado'}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${logro.descripcion || '¡Felicidades!'}</p>
+                            <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                                <i class="fas fa-gem"></i>
+                                <span>+${logro.xp_otorgado || 50} XP</span>
+                            </div>
+                        </div>
+                    </div>
+                `)
+                .join('');
+
             return `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white">Logros Recientes</h3>
                     </div>
-                    
+
                     <div class="space-y-4">
-                        ${logros.slice(0, 3).map(logro => `
-                            <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
-                                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
-                                    <span class="text-2xl">🎯</span>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-900 dark:text-white">${logro.titulo || 'Logro desbloqueado'}</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">${logro.descripcion || '¡Felicidades!'}</p>
-                                    <div class="mt-1 flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
-                                        <i class="fas fa-gem"></i>
-                                        <span>+${logro.xp_otorgado || 50} XP</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${logrosHtml}
                     </div>
                 </div>
             `;
@@ -915,6 +970,36 @@
             if (existente) existente.remove();
             if (!lecciones.length) return;
 
+            const tarjetasHtml = lecciones
+                .map((leccion) => `
+                    <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                                ${leccion.titulo}
+                            </h3>
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                                ${leccion.nivel}
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                            ${leccion.descripcion || 'Sin descripción'}
+                        </p>
+
+                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <span>⏱️ ${leccion.duracion_minutos || 30} min</span>
+                            <span>🌍 ${leccion.idiomaLabel || leccion.idioma || 'Inglés'}</span>
+                        </div>
+
+                        <button
+                            onclick="iniciarLeccionRecomendada('${leccion.idioma || 'ingles'}','${leccion.nivel || 'A1'}')"
+                            class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            Comenzar Lección
+                        </button>
+                    </div>
+                `)
+                .join('');
+
             const html = `
                 <div id="recommended-lessons-section" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mt-8">
                     <div class="flex justify-between items-center mb-6">
@@ -927,33 +1012,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        ${lecciones.map(leccion => `
-                            <div class="bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 hover:shadow-lg transition-all">
-                                <div class="flex justify-between items-start mb-4">
-                                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">
-                                        ${leccion.titulo}
-                                    </h3>
-                                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                                        ${leccion.nivel}
-                                    </span>
-                                </div>
-
-                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                                    ${leccion.descripcion || 'Sin descripción'}
-                                </p>
-
-                                <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                    <span>⏱️ ${leccion.duracion_minutos || 30} min</span>
-                                    <span>🌍 ${leccion.idiomaLabel || leccion.idioma || 'Inglés'}</span>
-                                </div>
-
-                                <button
-                                    onclick="iniciarLeccionRecomendada('${leccion.idioma || 'ingles'}','${leccion.nivel || 'A1'}')"
-                                    class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                                    Comenzar Lección
-                                </button>
-                            </div>
-                        `).join('')}
+                        ${tarjetasHtml}
                     </div>
                 </div>
             `;
@@ -1123,9 +1182,6 @@
         // INICIALIZACIÓN
         // ===================================
         
-        // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
-        prehidratarDashboardLocal();
-
         // Pre-hidratar con datos locales para que el estudiante siempre vea contenido aunque no haya API
         prehidratarDashboardLocal();
 
