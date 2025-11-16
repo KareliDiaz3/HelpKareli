@@ -495,15 +495,23 @@ class APIClient {
     }
 }
 
-// Crear instancia global inmediatamente (sin depender de DOMContentLoaded)
-if (typeof window !== 'undefined') {
+// Crear instancia global automáticamente lo antes posible
+function inicializarClienteGlobal(force = false) {
     try {
-        if (!window.apiClient) {
+        if (!window.apiClient || force) {
             window.apiClient = new APIClient();
         }
     } catch (error) {
-        console.error('💥 No fue posible inicializar APIClient automáticamente:', error);
+        console.error('💥 No se pudo inicializar APIClient:', error);
     }
+}
+
+// Inicializar inmediatamente para que ModuleLoader no quede esperando
+inicializarClienteGlobal();
+
+// Reintentar al completar el DOM por si alguna dependencia faltaba
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => inicializarClienteGlobal(true));
 }
 
 // Exportar para uso en módulos
