@@ -118,12 +118,10 @@ Panel de control principal para estudiantes después de iniciar sesión.
             </div>
         </div>
 
-        <!-- ✅ CONTENEDOR DINÁMICO PARA DATOS DE API -->
-        <div id="contenido-dashboard" class="hidden">
-            <!-- El contenido se genera dinámicamente desde dashboard.js -->
-        </div>
+        <!-- CONTENEDOR DINÁMICO -->
+        <div id="contenido-dashboard" class="hidden"></div>
 
-        <!-- ✅ LOADING STATE -->
+        <!-- LOADING -->
         <div id="loading-dashboard" class="flex items-center justify-center py-12">
             <div class="text-center">
                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
@@ -135,14 +133,10 @@ Panel de control principal para estudiantes después de iniciar sesión.
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm w-full"></div>
 
-    <!-- ============================================
-         ORDEN DE CARGA OPTIMIZADO (CRÍTICO)
-    ============================================ -->
-    
-    <!-- 1️⃣ CONFIGURACIÓN GLOBAL (SIEMPRE PRIMERO) -->
+    <!-- CONFIG -->
     <script src="/config/app-config.js"></script>
     
-    <!-- 2️⃣ CORE MODULES (async para no bloquear) -->
+    <!-- CORE -->
     <script src="/assets/js/core/utils.js" async></script>
     <script src="/assets/js/core/api-client.js" async></script>
     <script src="/assets/js/core/form-validator.js" async></script>
@@ -152,7 +146,18 @@ Panel de control principal para estudiantes después de iniciar sesión.
     <script src="/assets/js/data/student-progress.js"></script>
     <script src="/assets/js/core/navbar-loader.js" async></script>
 
-    <!-- 3️⃣ LÓGICA DE PÁGINA (defer para DOM listo) -->
+    <!-- LÓGICA DE PÁGINA -->
     <script type="module" src="/assets/js/pages/estudiante/dashboard.js"></script>
+
+    <!-- ⭐⭐⭐ FUNCIÓN AGREGADA PARA "COMENZAR LECCIÓN" ⭐⭐⭐ -->
+    <script>
+        document.addEventListener("click", (e) => {
+            // Si el botón tiene este texto o clase, captura el click
+            if (e.target.closest(".btn-comenzar-leccion")) {
+                window.location.href = "http://127.0.0.1:3000/pages/estudiante/lecciones.html";
+            }
+        });
+    </script>
+
 </body>
 </html>
