@@ -188,6 +188,12 @@
      * Configura todos los event listeners
      */
     function setupEventListeners() {
+        const logoutBtn = document.getElementById('logout-admin-btn');
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', manejarLogout);
+        }
+
         // Botones de gestión de contenido
         document.querySelectorAll('button').forEach(btn => {
             const texto = btn.textContent;
@@ -252,6 +258,29 @@
                 if (action) manejarAccionRapida(action);
             });
         });
+    }
+
+    async function manejarLogout() {
+        const logoutBtn = document.getElementById('logout-admin-btn');
+        const destino = APP_CONFIG?.UI?.RUTAS?.LOGIN || '/pages/auth/login.html';
+
+        try {
+            if (logoutBtn) {
+                logoutBtn.disabled = true;
+                logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saliendo...';
+            }
+
+            if (window.apiClient?.logout) {
+                await window.apiClient.logout();
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+            }
+        } catch (error) {
+            console.error('❌ Error al cerrar sesión del admin:', error);
+        } finally {
+            window.location.href = destino;
+        }
     }
 
     /**

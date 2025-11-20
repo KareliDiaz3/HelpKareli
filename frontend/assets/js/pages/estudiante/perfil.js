@@ -52,6 +52,7 @@
             UI: window.APP_CONFIG.UI,
             ROLES: window.APP_CONFIG.ROLES
         };
+        const endpoints = config.ENDPOINTS.AUTH;
 
         // ===================================
         // ELEMENTOS DEL DOM
@@ -172,7 +173,7 @@
 
             try {
                 // ✅ USAR apiClient PARA CARGAR DATOS DEL PERFIL
-                const response = await window.apiClient.get(config.ENDPOINTS.USUARIOS.PERFIL);
+                const response = await window.apiClient.get(endpoints.PERFIL);
 
                 if (response.success) {
                     estado.datosPerfil = response.data;
@@ -300,7 +301,7 @@
                 };
 
                 // ✅ USAR apiClient PARA ACTUALIZAR PERFIL
-                const response = await window.apiClient.put(config.ENDPOINTS.USUARIOS.ACTUALIZAR_PERFIL, datosActualizados);
+                const response = await window.apiClient.put(endpoints.ACTUALIZAR_PERFIL, datosActualizados);
 
                 if (response.success) {
                     window.toastManager.success('Información actualizada correctamente');
@@ -360,7 +361,14 @@
                 formData.append('foto_perfil', archivo);
 
                 // ✅ USAR apiClient PARA SUBIR FOTO
-                const response = await window.apiClient.uploadFile(config.ENDPOINTS.USUARIOS.SUBIR_FOTO, formData);
+                const uploadEndpoint = config.ENDPOINTS.USUARIO?.SUBIR_FOTO || endpoints.SUBIR_FOTO;
+
+                if (!uploadEndpoint) {
+                    window.toastManager.error('No hay endpoint configurado para subir la foto de perfil.');
+                    return;
+                }
+
+                const response = await window.apiClient.uploadFile(uploadEndpoint, formData);
 
                 if (response.success) {
                     window.toastManager.success('Foto de perfil actualizada correctamente');
@@ -434,11 +442,17 @@
 
             try {
                 // ✅ USAR apiClient PARA DESACTIVAR CUENTA
-                const response = await window.apiClient.post(config.ENDPOINTS.USUARIOS.DESACTIVAR_CUENTA);
+                const response = await window.apiClient.post(endpoints.DESACTIVAR_CUENTA);
 
                 if (response.success) {
-                    window.toastManager.success('Cuenta desactivada. Tienes 30 días para reactivarla.');
-                    
+                    const limite = response.reactivar_hasta ? new Date(response.reactivar_hasta) : null;
+                    const mensaje = limite
+                        ? `Cuenta desactivada. Puedes reactivarla hasta el ${limite.toLocaleDateString()}.`
+                        : 'Cuenta desactivada. Tienes 30 días para reactivarla.';
+
+                    window.toastManager.success(mensaje);
+                    ocultarModalDesactivar();
+
                     setTimeout(() => {
                         window.Utils.clearStorage();
                         window.location.href = config.UI.RUTAS.LOGIN;
@@ -464,14 +478,20 @@
 
             try {
                 // ✅ USAR apiClient PARA ELIMINAR CUENTA
-                const response = await window.apiClient.delete(config.ENDPOINTS.USUARIOS.ELIMINAR_CUENTA);
+                const response = await window.apiClient.delete(endpoints.ELIMINAR_CUENTA);
 
                 if (response.success) {
-                    window.toastManager.success('Cuenta eliminada permanentemente');
-                    
+                    const limite = response.reactivar_hasta ? new Date(response.reactivar_hasta) : null;
+                    const mensaje = limite
+                        ? `Cuenta marcada para eliminación. Puedes revertirla iniciando sesión antes del ${limite.toLocaleDateString()}.`
+                        : 'Cuenta marcada para eliminación. Tienes 30 días para reactivarla iniciando sesión nuevamente.';
+
+                    window.toastManager.success(mensaje);
+                    ocultarModalEliminar();
+
                     setTimeout(() => {
                         window.Utils.clearStorage();
-                        window.location.href = config.UI.RUTAS.REGISTRO;
+                        window.location.href = config.UI.RUTAS.LOGIN;
                     }, 2000);
                 } else {
                     throw new Error(response.error || 'Error al eliminar la cuenta');

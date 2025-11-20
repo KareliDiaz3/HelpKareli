@@ -54,6 +54,11 @@ const API_CONFIG = {
             RECUPERAR_PASSWORD: '/auth/recuperar-contrasena',
             RESTABLECER_PASSWORD: '/auth/restablecer-contrasena',
             VALIDAR_TOKEN_RECUPERACION: '/auth/validar-token-recuperacion',
+
+            // Gestión de ciclo de vida de cuenta
+            DESACTIVAR_CUENTA: '/auth/desactivar-cuenta',
+            ELIMINAR_CUENTA: '/auth/eliminar-cuenta',
+            REACTIVAR_CUENTA: '/auth/reactivar-cuenta',
             
             // UC-03: Autenticar usuario (verificación)
             VERIFICAR_EMAIL: '/auth/verificar',

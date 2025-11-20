@@ -1240,6 +1240,12 @@
         }
 
         function obtenerFallbackLecciones() {
+            const locales = progressStore?.getRecommendedLessons(8);
+            if (Array.isArray(locales) && locales.length) {
+                registrarDiagnostico('lecciones', 'Usando recomendaciones locales');
+                return locales;
+            }
+
             const data = clonarDashboardFallback();
             return data.leccionesRecomendadas || [];
         }

@@ -369,6 +369,9 @@ router.patch('/actualizar-nivel', validacionesActualizarNivel, authController.ac
 router.get('/verificar-token', authMiddleware.verificarToken, authController.verificarToken);
 router.get('/perfil', authMiddleware.verificarToken, authController.obtenerPerfil);
 router.post('/logout', authMiddleware.verificarToken, authController.cerrarSesion);
+router.post('/desactivar-cuenta', authMiddleware.verificarToken, authController.desactivarCuenta);
+router.delete('/eliminar-cuenta', authMiddleware.verificarToken, authController.eliminarCuenta);
+router.post('/reactivar-cuenta', authController.reactivarCuenta);
 
 // ==========================================================
 // RUTAS DE UTILIDAD Y DIAGNÓSTICO

@@ -52,9 +52,17 @@
                  HEADER DEL PROFESOR - MÓDULO 4
             ============================================ -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-gray-700">
-                <h1 id="nombreProfesor" class="text-2xl font-bold text-gray-900 dark:text-white">Cargando...</h1>
-                <p id="cursoAsignado" class="text-gray-600 dark:text-gray-400 mt-1">Cargando información del curso...</p>
-                <p id="nivelIdioma" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Cargando nivel e idioma...</p>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <h1 id="nombreProfesor" class="text-2xl font-bold text-gray-900 dark:text-white">Cargando...</h1>
+                        <p id="cursoAsignado" class="text-gray-600 dark:text-gray-400 mt-1">Cargando información del curso...</p>
+                        <p id="nivelIdioma" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Cargando nivel e idioma...</p>
+                    </div>
+                    <button id="logout-profesor-btn" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition-colors">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Cerrar sesión
+                    </button>
+                </div>
             </div>
 
             <!-- Loading State -->

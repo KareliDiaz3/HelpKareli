@@ -357,6 +357,7 @@ class ProfesorDashboard {
         const btnEstadisticas = document.getElementById('btnVerEstadisticas');
         const btnRetroalimentacion = document.getElementById('btnRetroalimentacion');
         const btnPlanificacion = document.getElementById('btnPlanificacion');
+        const btnLogout = document.getElementById('logout-profesor-btn');
 
         if (btnEstadisticas) {
             btnEstadisticas.addEventListener('click', () => {
@@ -374,6 +375,32 @@ class ProfesorDashboard {
             btnPlanificacion.addEventListener('click', () => {
                 window.location.href = '/pages/profesor/planificacion.html';
             });
+        }
+
+        if (btnLogout) {
+            btnLogout.addEventListener('click', () => this.manejarLogout(btnLogout));
+        }
+    }
+
+    async manejarLogout(btnLogout) {
+        const destino = window.APP_CONFIG?.UI?.RUTAS?.LOGIN || '/pages/auth/login.html';
+
+        try {
+            if (btnLogout) {
+                btnLogout.disabled = true;
+                btnLogout.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saliendo...';
+            }
+
+            if (window.apiClient?.logout) {
+                await window.apiClient.logout();
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+            }
+        } catch (error) {
+            console.error('❌ Error al cerrar sesión del profesor:', error);
+        } finally {
+            window.location.href = destino;
         }
     }
 

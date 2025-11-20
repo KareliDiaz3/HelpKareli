@@ -303,6 +303,16 @@
         localStorage.setItem(TOKEN, token);
         localStorage.setItem(USUARIO, JSON.stringify(usuario));
 
+        // Sincronizar estado local de progreso con el idioma y nivel actuales
+        try {
+            window.StudentProgress?.setProfile({
+                idioma: usuario?.datos_estudiante?.idioma_aprendizaje || usuario?.idioma,
+                nivel: usuario?.datos_estudiante?.nivel_actual
+            });
+        } catch (error) {
+            console.warn('No se pudo sincronizar StudentProgress tras login', error);
+        }
+
         window.toastManager.success(`¡Bienvenido ${usuario.nombre}!`);
 
         // ✅ REDIRIGIR SEGÚN ROL USANDO CONFIG CORRECTO

@@ -388,8 +388,12 @@
     }
 
     function obtenerLeccionesRecomendadas(snapshot, limite = 8) {
+        const cursosOrdenados = [...(snapshot.cursos || [])].sort((a, b) => (b.activo === a.activo ? 0 : b.activo ? 1 : -1));
+        const cursosFuente = cursosOrdenados.filter((curso) => curso.activo) || [];
+        const cursos = cursosFuente.length ? cursosFuente : cursosOrdenados;
+
         const combos = [];
-        snapshot.cursos.forEach((curso) => {
+        cursos.forEach((curso) => {
             LEVELS.forEach((nivel) => {
                 combos.push({
                     id: `${curso.id}-${nivel}`,

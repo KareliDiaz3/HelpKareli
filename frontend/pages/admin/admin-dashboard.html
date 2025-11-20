@@ -73,16 +73,23 @@ frontend/pages/admin/dashboard-admin.html
     <main class="min-h-screen pt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Header -->
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h2>
-                <p class="text-gray-600 dark:text-gray-300">Gestión completa del sistema SpeakLexi</p>
-                
-                <!-- Breadcrumb -->
-                <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span>Admin</span>
-                    <i class="fas fa-chevron-right text-xs"></i>
-                    <span class="text-purple-600 dark:text-purple-400">Dashboard</span>
+            <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h2>
+                    <p class="text-gray-600 dark:text-gray-300">Gestión completa del sistema SpeakLexi</p>
+
+                    <!-- Breadcrumb -->
+                    <div class="flex items-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span>Admin</span>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                        <span class="text-purple-600 dark:text-purple-400">Dashboard</span>
+                    </div>
                 </div>
+
+                <button id="logout-admin-btn" class="self-start inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition-colors">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar sesión
+                </button>
             </div>
 
             <!-- Stats Cards -->
