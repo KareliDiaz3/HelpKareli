@@ -11,6 +11,27 @@ const emailService = require('../services/emailService');
 let columnasEstadoCuentaAseguradas = false;
 let columnasBaseUsuariosAseguradas = false;
 
+const CODIGOS_ERROR_CONEXION = new Set([
+    'ECONNREFUSED',
+    'ENOTFOUND',
+    'ER_ACCESS_DENIED_ERROR',
+    'PROTOCOL_CONNECTION_LOST',
+    'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR',
+    'PROTOCOL_ENQUEUE_AFTER_QUIT',
+    'PROTOCOL_SEQUENCE_TIMEOUT'
+]);
+
+function responderErrorConexion(res, error, contexto = 'la operación solicitada') {
+    if (error && (CODIGOS_ERROR_CONEXION.has(error.code) || /ECONNREFUSED/i.test(error.message))) {
+        console.error('🚫 Servicio de base de datos no disponible:', error.message);
+        return res.status(503).json({
+            error: 'Servicio de base de datos no disponible',
+            detalles: 'Verifica la conexión MySQL antes de intentar ' + contexto
+        });
+    }
+    return null;
+}
+
 async function asegurarColumnasBaseUsuarios() {
     if (columnasBaseUsuariosAseguradas) return;
 
@@ -348,8 +369,6 @@ exports.verificarCuenta = async (req, res) => {
 exports.iniciarSesion = async (req, res) => {
     try {
         await asegurarColumnasBaseUsuarios();
-        await asegurarColumnasBaseUsuarios();
-        await asegurarColumnasBaseUsuarios();
         await asegurarColumnasEstadoCuenta();
 
         const { correo, password } = req.body;
@@ -465,9 +484,11 @@ exports.iniciarSesion = async (req, res) => {
         });
 
     } catch (error) {
+        if (responderErrorConexion(res, error, 'iniciar sesión')) return;
+
         console.error('Error en login:', error);
-        res.status(500).json({ 
-            error: 'Error interno del servidor en el login' 
+        res.status(500).json({
+            error: 'Error interno del servidor en el login'
         });
     }
 };

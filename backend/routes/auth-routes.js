@@ -7,6 +7,7 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
+const database = require('../config/database');
 
 // ==========================================================
 // MIDDLEWARE PARA MANEJAR ERRORES DE VALIDACIÓN
@@ -58,6 +59,30 @@ const CONFIG = {
   },
   NIVELES: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
   IDIOMAS: ['Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués', 'Japonés', 'Coreano', 'Chino']
+};
+
+// ==========================================================
+// GUARDIA DE CONEXIÓN A LA BASE DE DATOS
+// ==========================================================
+const requireDatabase = async (req, res, next) => {
+  try {
+    const disponible = await database.testConnection();
+
+    if (!disponible) {
+      return res.status(503).json({
+        error: 'Servicio de base de datos no disponible',
+        detalles: 'Verifica que MySQL esté en ejecución o revisa las credenciales en el entorno'
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('❌ Error verificando la conexión a la base de datos:', error.message);
+    return res.status(503).json({
+      error: 'Servicio de base de datos no disponible',
+      detalles: error.message
+    });
+  }
 };
 
 // ==========================================================
@@ -345,33 +370,33 @@ router.use((req, res, next) => {
 // ==========================================================
 
 // Registro y verificación
-router.post('/registro', validacionesRegistro, authController.registrarUsuario);
-router.post('/verificar', validacionesVerificacion, authController.verificarCuenta);
-router.post('/reenviar-verificacion', validacionesReenviarCodigo, authController.reenviarVerificacion);
+router.post('/registro', requireDatabase, validacionesRegistro, authController.registrarUsuario);
+router.post('/verificar', requireDatabase, validacionesVerificacion, authController.verificarCuenta);
+router.post('/reenviar-verificacion', requireDatabase, validacionesReenviarCodigo, authController.reenviarVerificacion);
 
 // Login
-router.post('/login', validacionesLogin, authController.iniciarSesion);
+router.post('/login', requireDatabase, validacionesLogin, authController.iniciarSesion);
 
 // Recuperación de contraseña
-router.post('/recuperar-contrasena', validacionesRecuperarPassword, authController.solicitarRecuperacionContrasena);
-router.post('/restablecer-contrasena', validacionesRestablecerPassword, authController.restablecerContrasena);
+router.post('/recuperar-contrasena', requireDatabase, validacionesRecuperarPassword, authController.solicitarRecuperacionContrasena);
+router.post('/restablecer-contrasena', requireDatabase, validacionesRestablecerPassword, authController.restablecerContrasena);
 
 // ✅✅✅ CORRECCIÓN CRÍTICA: Actualización de nivel SIN AUTENTICACIÓN para onboarding
 // El usuario aún no tiene token JWT durante el proceso de onboarding
 // La validación se hace con el correo en el body del request
-router.patch('/actualizar-nivel', validacionesActualizarNivel, authController.actualizarNivel);
+router.patch('/actualizar-nivel', requireDatabase, validacionesActualizarNivel, authController.actualizarNivel);
 
 // ==========================================================
 // RUTAS PROTEGIDAS (CON AUTENTICACIÓN)
 // ==========================================================
 
 // Verificación y gestión de cuenta
-router.get('/verificar-token', authMiddleware.verificarToken, authController.verificarToken);
-router.get('/perfil', authMiddleware.verificarToken, authController.obtenerPerfil);
-router.post('/logout', authMiddleware.verificarToken, authController.cerrarSesion);
-router.post('/desactivar-cuenta', authMiddleware.verificarToken, authController.desactivarCuenta);
-router.delete('/eliminar-cuenta', authMiddleware.verificarToken, authController.eliminarCuenta);
-router.post('/reactivar-cuenta', authController.reactivarCuenta);
+router.get('/verificar-token', requireDatabase, authMiddleware.verificarToken, authController.verificarToken);
+router.get('/perfil', requireDatabase, authMiddleware.verificarToken, authController.obtenerPerfil);
+router.post('/logout', requireDatabase, authMiddleware.verificarToken, authController.cerrarSesion);
+router.post('/desactivar-cuenta', requireDatabase, authMiddleware.verificarToken, authController.desactivarCuenta);
+router.delete('/eliminar-cuenta', requireDatabase, authMiddleware.verificarToken, authController.eliminarCuenta);
+router.post('/reactivar-cuenta', requireDatabase, authController.reactivarCuenta);
 
 // ==========================================================
 // RUTAS DE UTILIDAD Y DIAGNÓSTICO
