@@ -9,6 +9,50 @@ const emailService = require('../services/emailService');
 // ==========================================================
 
 let columnasEstadoCuentaAseguradas = false;
+let columnasBaseUsuariosAseguradas = false;
+
+async function asegurarColumnasBaseUsuarios() {
+    if (columnasBaseUsuariosAseguradas) return;
+
+    try {
+        // En entornos donde "ADD COLUMN IF NOT EXISTS" no está disponible (MySQL 5.7),
+        // comprobamos columna por columna antes de alterarla para evitar errores 500.
+        const verificarColumna = async (columna) => {
+            const [rows] = await database.query(
+                'SHOW COLUMNS FROM usuarios LIKE ?',
+                [columna]
+            );
+            return rows.length > 0;
+        };
+
+        const columnasAAgregar = [];
+
+        const existeCorreoVerificado = await verificarColumna('correo_verificado');
+        if (!existeCorreoVerificado) {
+            columnasAAgregar.push('ADD COLUMN correo_verificado TINYINT(1) NOT NULL DEFAULT 0');
+        }
+
+        const existeEstadoCuenta = await verificarColumna('estado_cuenta');
+        if (!existeEstadoCuenta) {
+            columnasAAgregar.push("ADD COLUMN estado_cuenta ENUM('activo','pendiente_verificacion','desactivado','bloqueado') NOT NULL DEFAULT 'pendiente_verificacion'");
+        }
+
+        const existeUltimoAcceso = await verificarColumna('ultimo_acceso');
+        if (!existeUltimoAcceso) {
+            columnasAAgregar.push('ADD COLUMN ultimo_acceso DATETIME NULL');
+        }
+
+        if (columnasAAgregar.length > 0) {
+            const alterSQL = `ALTER TABLE usuarios ${columnasAAgregar.join(', ')}`;
+            await database.query(alterSQL);
+            console.log('✅ Columnas base de usuarios aseguradas:', columnasAAgregar);
+        }
+
+        columnasBaseUsuariosAseguradas = true;
+    } catch (error) {
+        console.warn('⚠️  No se pudieron asegurar las columnas base de usuarios:', error.message);
+    }
+}
 
 async function asegurarColumnasEstadoCuenta() {
     if (columnasEstadoCuentaAseguradas) return;
@@ -303,6 +347,9 @@ exports.verificarCuenta = async (req, res) => {
 // @access  Public
 exports.iniciarSesion = async (req, res) => {
     try {
+        await asegurarColumnasBaseUsuarios();
+        await asegurarColumnasBaseUsuarios();
+        await asegurarColumnasBaseUsuarios();
         await asegurarColumnasEstadoCuenta();
 
         const { correo, password } = req.body;
@@ -837,6 +884,7 @@ exports.cerrarSesion = async (req, res) => {
 // @access  Private
 exports.desactivarCuenta = async (req, res) => {
     try {
+        await asegurarColumnasBaseUsuarios();
         await asegurarColumnasEstadoCuenta();
 
         const usuarioId = req.user.id;
@@ -873,6 +921,7 @@ exports.desactivarCuenta = async (req, res) => {
 // @access  Private
 exports.eliminarCuenta = async (req, res) => {
     try {
+        await asegurarColumnasBaseUsuarios();
         await asegurarColumnasEstadoCuenta();
 
         const usuarioId = req.user.id;
@@ -909,6 +958,7 @@ exports.eliminarCuenta = async (req, res) => {
 // @access  Public
 exports.reactivarCuenta = async (req, res) => {
     try {
+        await asegurarColumnasBaseUsuarios();
         await asegurarColumnasEstadoCuenta();
 
         const { correo, password } = req.body;
